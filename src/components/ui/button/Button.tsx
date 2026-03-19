@@ -1,0 +1,25 @@
+import { ReactNode } from 'react';
+
+interface ButtonProps {
+    text: string;
+    onClick: () => void;
+    icon?: ReactNode;
+    isActive?: boolean;
+}
+
+export default function Button({ text, onClick, icon, isActive = false }: ButtonProps) {
+
+    const activeClass = isActive
+        ? 'bg-bg-active cursor-default'
+        : 'hover:bg-bg-hover active:bg-bg-active cursor-pointer';
+
+    return (
+        <button
+            onClick={onClick}
+            className={`text-white w-32 h-7 inline-flex items-center justify-start rounded-sm gap-2  transition ${activeClass}`}
+        >
+            {icon ? <span aria-hidden='true'>{icon}</span> : null}
+            {text}
+        </button>
+    )
+}
