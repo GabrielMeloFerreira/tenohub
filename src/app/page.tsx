@@ -1,25 +1,26 @@
 'use client'
 
-import { useNotes } from '@/hooks/useNotes'
+import { useSideBar } from "@/hooks/useSideBar"
+
 import Sidebar from "@/components/layout/Sidebar"
 import NoteGrid from "@/components/notes/NoteGrid"
 import NoteEditor from "@/components/notes/NoteEditor"
 
-type View = 'notes' | 'todo' | 'calendar' | 'settings'
+type View = 'notes' | 'todo' | 'calendar' | 'settings' | 'user'
 
 export default function Home () {
 
-  const { view, notes, selectedId, selectedNote, handleNewNote, handleSelectNote, handleDeleteNote, handleUpdateNote, setView } = useNotes();
+  const {view, handleClickNewNote, handleClickView} = useSideBar()
 
   return (
     <div>
       <Sidebar
         view={view}
-        onSelectView={setView}
-        onSelectNewNote={handleNewNote}
+        handleClick={handleClickView}
+        onSelectNewNote={handleClickNewNote}
       />
 
-      {view === 'notes' && (
+      {/* {view === 'notes' && (
         <>
           <NoteGrid
             notes={notes}
@@ -27,7 +28,7 @@ export default function Home () {
             onSelectNote={handleSelectNote}
           />
         </>
-      )}
+      )} */}
     </div>
   )
 

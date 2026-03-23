@@ -16,8 +16,7 @@ export default function Button({ text, onClick, icon, isActive = false }: Button
     return (
         <button
             onClick={onClick}
-            className={`text-white w-32 h-7 inline-flex items-center justify-start rounded-sm gap-2  transition ${activeClass}`}
-        >
+            className={`w-full text-white h-7 inline-flex items-center justify-start rounded-sm gap-2 transition ${activeClass}`}>
             {icon ? <span aria-hidden='true'>{icon}</span> : null}
             {text}
         </button>

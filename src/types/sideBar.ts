@@ -1,0 +1,1 @@
+export type View = 'notes' | 'todo' | 'calendar' | 'settings' | 'user'

@@ -2,10 +2,13 @@ import { Note } from "@/types";
 import { useState } from "react"
 import { mockNotes } from "@/data/mockNotes";
 
+type View = 'notes' | 'todo' | 'calendar' | 'settings' | 'user'
+
 
 export function useSideBar () {
     const [ notes, setNotes ] = useState<Note[]>(mockNotes);
     const [ selectedId, setSelectedId ] = useState<string | null>(null);
+    const [ view, setView ] = useState<View>('notes')
 
     function handleClickNewNote () {
         const newNote: Note = {
@@ -18,23 +21,17 @@ export function useSideBar () {
         setNotes([newNote, ...notes]);
         setSelectedId(newNote.id);
         console.log(newNote)
+        console.log(selectedId)
     }
 
-    function handleClickMyNotes () {
-        
-    }
-    function handleClickTodo () {
-        
-    }
-    function handleClickCalendar () {
-        
+    function handleClickView (view: View) {
+        setView(view);
     }
 
     return {
         handleClickNewNote,
-        handleClickMyNotes,
-        handleClickTodo,
-        handleClickCalendar
+        handleClickView,
+        view
     }
 
 }
