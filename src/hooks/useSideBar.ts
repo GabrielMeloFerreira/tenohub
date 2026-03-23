@@ -1,9 +1,7 @@
 import { Note } from "@/types";
+import { View } from "@/types/sideBar";
 import { useState } from "react"
 import { mockNotes } from "@/data/mockNotes";
-
-type View = 'notes' | 'todo' | 'calendar' | 'settings' | 'user'
-
 
 export function useSideBar () {
     const [ notes, setNotes ] = useState<Note[]>(mockNotes);
