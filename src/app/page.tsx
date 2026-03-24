@@ -3,32 +3,27 @@
 import { useSideBar } from "@/hooks/useSideBar"
 
 import Sidebar from "@/components/layout/Sidebar"
-import NoteGrid from "@/components/notes/NoteGrid"
-import NoteEditor from "@/components/notes/NoteEditor"
-
-type View = 'notes' | 'todo' | 'calendar' | 'settings' | 'user'
+import MyNotes from "@/components/layout/MyNotes"
 
 export default function Home () {
 
   const {view, handleClickNewNote, handleClickView} = useSideBar()
 
   return (
-    <div>
+    <div className="flex gap-2">
       <Sidebar
         view={view}
         handleClick={handleClickView}
         onSelectNewNote={handleClickNewNote}
       />
 
-      {/* {view === 'notes' && (
+      {view === 'notes' && (
         <>
-          <NoteGrid
-            notes={notes}
-            selectedId={selectedId}
-            onSelectNote={handleSelectNote}
+          <MyNotes
+            username={'Gabriel de Melo Ferreira'}
           />
         </>
-      )} */}
+      )}
     </div>
   )
 
