@@ -10,8 +10,8 @@ interface ButtonProps {
 export default function Button({ text, onClick, icon, isActive = false }: ButtonProps) {
 
     const activeClass = isActive
-        ? 'bg-bg-active cursor-default'
-        : 'hover:bg-bg-hover active:bg-bg-active cursor-pointer';
+        ? 'bg-buttons-active cursor-default'
+        : 'hover:bg-buttons-hover active:bg-buttons-active cursor-pointer';
 
     return (
         <button

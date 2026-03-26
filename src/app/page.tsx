@@ -10,7 +10,7 @@ export default function Home () {
   const {view, handleClickNewNote, handleClickView} = useSideBar()
 
   return (
-    <div className="flex gap-2">
+    <div className="flex h-screen overflow-hidden">
       <Sidebar
         view={view}
         handleClick={handleClickView}

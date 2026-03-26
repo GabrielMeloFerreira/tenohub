@@ -11,8 +11,8 @@ export interface SideBarUserProps {
 export default function UserSideBar ({ name, photo, onClick, isActive = false }: SideBarUserProps) {
 
     const activeClass = isActive
-    ? 'bg-bg-active cursor-default'
-    : 'hover:bg-bg-hover active:bg-bg-active cursor-pointer';
+    ? 'bg-buttons-active cursor-default'
+    : 'hover:bg-buttons-hover active:bg-buttons-active cursor-pointer';
 
     return (
         <div onClick={onClick} className={`w-full text-white h-8 truncate inline-flex items-center justify-start rounded-sm gap-2 transition ${activeClass}`}>

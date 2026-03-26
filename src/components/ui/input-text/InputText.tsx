@@ -12,11 +12,11 @@ export default function InputText ({ placeHolder, isActive = false, onClick }: I
 
     const activeClass = isActive
     ? 'bg-transparent cursor-default'
-    : 'hover:bg-bg-hover active:bg-transparent';
+    : 'hover:bg-buttons-hover active:bg-transparent';
 
     return (
         <div onClick={onClick} className={`flex items-center gap-2 rounded-sm transition h-7 ${activeClass}`}>
-            <SearchIcon className='text-sm'/>
+            <SearchIcon className='text-sm text-white'/>
             <input type='text' name='search' placeholder={placeHolder} className='text-sm bg-transparent outline-none text-white'/>
         </div>
     )

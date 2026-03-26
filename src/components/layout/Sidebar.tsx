@@ -22,10 +22,10 @@ export default function Sidebar({ view, handleClick, onSelectNewNote }: SidebarP
 
     return (
         <>
-            <nav className='flex flex-col h-screen max-w-60 overflow-hidden bg-bg-base gap-20'>
+            <nav className='flex flex-col h-screen max-w-60 min-w-60 overflow-hidden bg-bg-base gap-20 mt-2 ml-2 mr-2'>
                 <div className='flex flex-col gap-10'>
-                        <UserSideBar onClick={() => handleClick('user')} isActive={view==='user'} name="Gabriel de Melo Ferreira" photo="pfp.jpg"/>
-                        <InputText onClick={() => handleClick('search')} isActive={view === 'search'} placeHolder="Search notes..."/>
+                        <UserSideBar onClick={() => handleClick('user')} isActive={view==='user'} name={'Gabriel de Melo Ferreira'} photo='pfp.jpg'/>
+                        <InputText onClick={() => handleClick('notes')} isActive={view === 'search'} placeHolder='Search notes...'/>
                 </div>
 
                 <div className='flex flex-col gap-5'>
