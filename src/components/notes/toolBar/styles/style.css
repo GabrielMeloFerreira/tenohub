@@ -1,0 +1,23 @@
+.ProseMirror:focus {
+    outline: none !important;
+}
+
+.ProseMirror {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+    padding: 3rem;
+    width: 100%;
+    box-sizing: border-box;
+    line-height: 1.5;
+    padding: 40px !important;
+    margin-top: 20px;
+    font-size: large;
+}
+
+.tiptap p {
+    margin: 0 !important;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+}

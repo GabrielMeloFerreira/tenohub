@@ -4,6 +4,7 @@ import { useSideBar } from "@/hooks/useSideBar"
 
 import Sidebar from "@/components/layout/Sidebar"
 import MyNotes from "@/components/layout/MyNotes"
+import NoteEditor from "@/components/layout/NoteEditor"
 
 export default function Home () {
 
@@ -11,18 +12,13 @@ export default function Home () {
 
   return (
     <div className="flex h-screen overflow-hidden">
-      <Sidebar
-        view={view}
-        handleClick={handleClickView}
-        onSelectNewNote={handleClickNewNote}
-      />
+      <Sidebar view={view} handleClick={handleClickView} onSelectNewNote={handleClickNewNote}/>
 
       {view === 'notes' && (
-        <>
-          <MyNotes
-            username={'Gabriel de Melo Ferreira'}
-          />
-        </>
+        <div className='flex flex-1 overflow-hidden'>
+          <MyNotes username={'Gabriel de Melo Ferreira'}/>
+          <NoteEditor/>
+        </div>
       )}
     </div>
   )

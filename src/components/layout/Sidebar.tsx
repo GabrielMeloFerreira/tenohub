@@ -11,6 +11,7 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import NotesIcon from '@mui/icons-material/Notes';
 import TaskAltIcon from '@mui/icons-material/TaskAlt';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import SearchIcon from '@mui/icons-material/Search';
 
 interface SidebarProps {
     view: View
@@ -25,7 +26,7 @@ export default function Sidebar({ view, handleClick, onSelectNewNote }: SidebarP
             <nav className='flex flex-col h-screen max-w-60 min-w-60 overflow-hidden bg-bg-base gap-20 mt-2 ml-2 mr-2'>
                 <div className='flex flex-col gap-10'>
                         <UserSideBar onClick={() => handleClick('user')} isActive={view==='user'} name={'Gabriel de Melo Ferreira'} photo='pfp.jpg'/>
-                        <InputText onClick={() => handleClick('notes')} isActive={view === 'search'} placeHolder='Search notes...'/>
+                        <InputText onClick={() => handleClick('notes')} isActive={view === 'search'} placeHolder='Search notes...' icon={<SearchIcon />}/>
                 </div>
 
                 <div className='flex flex-col gap-5'>
