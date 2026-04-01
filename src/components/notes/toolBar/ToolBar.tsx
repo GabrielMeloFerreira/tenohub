@@ -1,66 +1,67 @@
-import { RichTextProvider } from 'reactjs-tiptap-editor'
-import { Document } from '@tiptap/extension-document'
-import { Text } from '@tiptap/extension-text'
-import { Paragraph } from '@tiptap/extension-paragraph'
-import { Dropcursor, Gapcursor, Placeholder, TrailingNode } from '@tiptap/extensions'
-import { HardBreak } from '@tiptap/extension-hard-break'
-import { TextStyle } from '@tiptap/extension-text-style';
-import { ListItem } from '@tiptap/extension-list';
+'use client'
+import FormatBoldIcon from '@mui/icons-material/FormatBold';
+import FormatItalicIcon from '@mui/icons-material/FormatItalic';
+import FormatUnderlinedIcon from '@mui/icons-material/FormatUnderlined';
+import StrikethroughSIcon from '@mui/icons-material/StrikethroughS';
+import AddLinkIcon from '@mui/icons-material/AddLink';
+import UndoIcon from '@mui/icons-material/Undo';
+import RedoIcon from '@mui/icons-material/Redo';
+import FormatAlignLeftIcon from '@mui/icons-material/FormatAlignLeft';
+import FormatAlignCenterIcon from '@mui/icons-material/FormatAlignCenter';
+import FormatAlignRightIcon from '@mui/icons-material/FormatAlignRight';
+import FormatAlignJustifyIcon from '@mui/icons-material/FormatAlignJustify';
+import Divider from '@mui/material/Divider';
 
-import { History, RichTextUndo, RichTextRedo } from 'reactjs-tiptap-editor/history';
-import { Bold, RichTextBold } from 'reactjs-tiptap-editor/bold'; 
+import { getButtonClass, getStatelessButtonClass } from '@/utils/styles/toolbarStyles';
 
-import './styles/style.css'
- 
-import 'reactjs-tiptap-editor/style.css';
 
-import { EditorContent, useEditor } from "@tiptap/react"
+import { Editor } from '@tiptap/react'
 
-const extensions = [
-  // Base Extensions
-  Document,
-  Text,
-  Dropcursor,
-  Gapcursor,
-  HardBreak,
-  Paragraph,
-  TrailingNode,
-  ListItem,
-  TextStyle,
-  Placeholder.configure({
-    placeholder: 'Press \'/\' for commands',
-  }),
-  History,
-  Bold
-];
-
-const RichTextToolbar = () => {
-  return (
-    <div className="flex fixed w-full z-1 bg-base text-white">
-      <RichTextUndo />
-      <RichTextRedo />
-      <RichTextBold />
-    </div>
-  )
+interface ToolBarProps {
+  editor: Editor | null
 }
 
-export default function ToolBar() {
-    const editor = useEditor({
-        textDirection: 'auto',
-        extensions,
-        immediatelyRender: false
-    })
+export default function ToolBar({ editor }: ToolBarProps) {
 
-    return (
-        <>
-            <div className='flex flex-col h-full w-full overflow-y-auto'>
-                {editor && (
-                    <RichTextProvider editor={editor}>
-                        <RichTextToolbar />
-                        <EditorContent className='bg-base text-white flex-1 overflow-y-auto w-full' editor={editor}/>
-                    </RichTextProvider>
-                )}
-            </div>
-        </>
-    )
+  if (!editor) return null
+
+  return (
+    <div className='flex text-xl p-2 ml-2 gap-0.5'>
+      <button onClick={() => editor.chain().focus().undo().run()} className={getStatelessButtonClass()}>
+        <UndoIcon />
+      </button>
+      <button onClick={() => editor.chain().focus().redo().run()} className={getStatelessButtonClass()}>
+        <RedoIcon />
+      </button>
+      <Divider orientation='vertical' variant='middle' className='bg-white' flexItem/>
+      <button onClick={() => editor.chain().focus().toggleBold().run()} className={getButtonClass(editor.isActive('bold'))}>
+        <FormatBoldIcon />
+      </button>
+      <button onClick={() => editor.chain().focus().toggleItalic().run()} className={getButtonClass(editor.isActive('italic'))}>
+        <FormatItalicIcon />
+      </button>
+      <button onClick={() => editor.chain().focus().toggleUnderline().run()} className={getButtonClass(editor.isActive('underline'))}>
+        <FormatUnderlinedIcon />
+      </button>
+      <button onClick={() => editor.chain().focus().toggleStrike().run()} className={getButtonClass(editor.isActive('strike'))}>
+        <StrikethroughSIcon />
+      </button>
+      <button onClick={() => editor.chain().focus().toggleLink().run()} className={getStatelessButtonClass()}>
+        <AddLinkIcon />
+      </button>
+      <Divider orientation='vertical' variant='middle' className='bg-white' flexItem/>
+      <button onClick={() => editor.chain().focus().toggleTextAlign('left').run()} className={getStatelessButtonClass()}>
+        <FormatAlignLeftIcon />
+      </button>
+      <button onClick={() => editor.chain().focus().toggleTextAlign('center').run()} className={getStatelessButtonClass()}>
+        <FormatAlignCenterIcon />
+      </button>
+      <button onClick={() => editor.chain().focus().toggleTextAlign('right').run()} className={getStatelessButtonClass()}>
+        <FormatAlignRightIcon />
+      </button>
+      <button onClick={() => editor.chain().focus().toggleTextAlign('justify').run()} className={getStatelessButtonClass()}>
+        <FormatAlignJustifyIcon />
+      </button>
+    </div>
+  )
 }
