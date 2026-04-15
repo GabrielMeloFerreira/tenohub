@@ -26,7 +26,7 @@ export default function ToolBar({ editor }: ToolBarProps) {
   if (!editor) return null
 
   return (
-    <div className='flex text-xl p-2 ml-2 gap-0.5'>
+    <div className='flex sticky top-0 z-100 bg-black text-xl p-2 ml-2 gap-0.5'>
       <button onClick={() => editor.chain().focus().undo().run()} className={getStatelessButtonClass()}>
         <UndoIcon />
       </button>

@@ -1,10 +1,10 @@
-import NoteModal from "../notes/NoteModal";
+import NoteModal from "./NoteModal";
 
 interface MyNotesProps {
     username: string;
 }
 
-export default function MyNotes ({ username }: MyNotesProps) {
+export default function SideNotes ({ username }: MyNotesProps) {
 
     return(
         <>

@@ -3,7 +3,7 @@
 import { View } from "@/types/sideBar";
 
 import Button from "../ui/button/Button";
-import UserSideBar from "../user/UserSideBar";
+import UserSideBar from "./UserSideBar";
 import InputText from "../ui/input-text/InputText";
 import SettingsIcon from '@mui/icons-material/Settings';
 

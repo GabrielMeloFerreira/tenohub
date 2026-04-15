@@ -2,9 +2,9 @@
 
 import { useSideBar } from "@/hooks/useSideBar"
 
-import Sidebar from "@/components/layout/Sidebar"
-import MyNotes from "@/components/layout/MyNotes"
-import NoteEditor from "@/components/layout/NoteEditor"
+import Sidebar from "@/components/Sidebar/Sidebar"
+import MyNotes from "@/components/SideNotes/SideNotes"
+import NoteEditor from "@/components/NoteEditor/NoteEditor"
 
 export default function Home () {
 

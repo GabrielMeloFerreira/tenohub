@@ -11,7 +11,7 @@ interface InputTextProps {
     onClick?: () => void;
 }
 
-export default function InputText ({ classNameDiv,classNameInput, icon, placeHolder, isActive = false, onClick, }: InputTextProps) {
+export default function InputText ({ classNameDiv, classNameInput, icon, placeHolder, isActive = false, onClick, }: InputTextProps) {
 
     // const activeClass = isActive
     // ? 'bg-transparent cursor-default'

@@ -4,7 +4,9 @@ import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import TextAlign from '@tiptap/extension-text-align'
 import InputText from "../ui/input-text/InputText"
-import ToolBar from "../notes/toolBar/ToolBar"
+import ToolBar from "./ToolBar"
+import './styles/NoteEditor.css'; 
+
 
 export default function NoteEditor() {
 
@@ -22,7 +24,7 @@ export default function NoteEditor() {
   })
 
   return (
-    <div className='flex flex-col h-full w-full overflow-hidden'>
+    <div className='flex flex-col h-full w-full overflow-x-hidden'>
       <header>
         <div className='text-gray-400 text-sm gap-2 m-2'>Caminho</div>
         <div className='flex flex-col border-b-2 border-t-2 gap-3 text-white text-2xl m-2 justify-start items-center'>
@@ -37,8 +39,8 @@ export default function NoteEditor() {
 
       <ToolBar editor={editor} />
 
-      <div className='flex-1 overflow-y-auto'>
-        <EditorContent editor={editor} className='h-full p-4 text-white outline-none' />
+      <div className='flex-1 '>
+        <EditorContent editor={editor} className='h-full p-4 text-white outline-none ' />
       </div>
     </div>
   )
