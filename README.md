@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<div align="center">
 
-## Getting Started
+# 📝 Tenohub
 
-First, run the development server:
+**A modern, minimalist note-taking app inspired by Notion**
+
+![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=next.js&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![TipTap](https://img.shields.io/badge/TipTap-6C63FF?style=for-the-badge)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+
+🚧 **Em desenvolvimento ativo** — novas funcionalidades sendo adicionadas semanalmente.
+
+<!-- [🔗 Ver demo ao vivo](https://tenohub.vercel.app) -->
+
+</div>
+
+---
+
+## ✨ Funcionalidades
+
+- 📋 **Sidebar de navegação** — alterne entre notas com um clique
+- ✏️ **Editor rico com TipTap** — experiência de edição fluida e moderna
+- 🧱 **Estrutura inspirada no Notion** — organização simples e poderosa
+
+### 🛣️ Roadmap
+
+- [ ] Criação e exclusão de notas
+- [ ] Persistência de dados (banco de dados)
+- [ ] Autenticação de usuário
+- [ ] Organização por pastas/tags
+- [ ] Compartilhamento de notas
+
+---
+
+## 🛠️ Tecnologias
+
+| Tecnologia | Uso |
+|---|---|
+| Next.js 14 | Framework principal (App Router) |
+| TypeScript | Tipagem estática |
+| TipTap | Editor de texto rico |
+| Tailwind CSS | Estilização |
+
+---
+
+## 🚀 Rodando localmente
 
 ```bash
+# Clone o repositório
+git clone https://github.com/GabrielMeloFerreira/tenohub.git
+
+# Instale as dependências
+npm install
+
+# Rode o servidor de desenvolvimento
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Acesse [http://localhost:3000](http://localhost:3000) no seu navegador.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 👨‍💻 Autor
 
-## Learn More
+**Gabriel Melo** — Desenvolvedor Fullstack
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/gabriel-melo-dev/)
+[![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/GabrielMeloFerreira)
