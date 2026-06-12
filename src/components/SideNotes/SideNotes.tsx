@@ -9,7 +9,7 @@ export default function SideNotes ({ username }: MyNotesProps) {
     return(
         <>
         <div className='max-w-90'>
-            <div className='flex flex-col h-screen gap-8 shadow-sm bg-base text-white border-x-2 border-border'>
+            <div className='flex flex-col h-screen gap-8 shadow-sm text-white border-x-2 border-border'>
                     <header className='flex flex-col gap-2 mt-2 ml-2 mr-2'>
                         <div className='text-white'>{username} Notes</div>
                         <div className='text-white text-sm'>{'total notes'} Notes</div>

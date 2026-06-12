@@ -5,7 +5,7 @@ import StarterKit from '@tiptap/starter-kit'
 import TextAlign from '@tiptap/extension-text-align'
 import InputText from "../ui/input-text/InputText"
 import ToolBar from "./ToolBar"
-import './styles/NoteEditor.css'; 
+import './styles/NoteEditor.css'
 
 
 export default function NoteEditor() {
