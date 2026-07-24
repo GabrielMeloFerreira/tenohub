@@ -1,5 +1,9 @@
 # Fase 2 — Dados e Autenticação
 
+> **Status: backend concluído e verificado contra o banco real (24/07/2026).**
+> Falta só a verificação do fluxo de login no navegador e a config do painel do
+> Supabase (Google OAuth). Detalhes no fim do documento, em **Estado da execução**.
+
 **Objetivo:** login funcionando e notas persistindo em Postgres. Ao final, recarregar
 a página não perde nada e abrir em outro dispositivo mostra as mesmas notas.
 
@@ -174,10 +178,76 @@ código da aplicação.
 
 ## Critério de conclusão da Fase 2
 
-- Signup, login e logout funcionando
-- Criar nota → recarregar a página → a nota continua lá
-- Abrir em outro navegador com a mesma conta → as mesmas notas
-- Dois usuários diferentes não enxergam nada um do outro (**testar de verdade, com
-  duas contas — é o teste que revela filtro de `userId` esquecido**)
-- Nenhuma chave de serviço exposta ao cliente
-- `tsc --noEmit` limpo
+- [x] `tsc --noEmit`, `lint` e `build` limpos
+- [x] Schema no banco: 6 tabelas, índices, RLS ligado + 6 policies `auth.uid() = user_id`
+- [x] Camada de dados verificada (insert/select/soft-delete via DATABASE_URL) contra o banco real
+- [x] Middleware protege a área logada (runtime: `/` sem sessão → 307 → `/login`)
+- [x] Nenhuma chave de serviço exposta ao cliente
+- [ ] Signup, login e logout **pelo navegador** — falta verificar (precisa de sessão real)
+- [ ] Criar nota → recarregar → continua lá — falta verificar pela UI
+- [ ] Abrir em outro navegador com a mesma conta → as mesmas notas
+- [ ] Dois usuários não enxergam nada um do outro (**testar com duas contas** — revela
+      filtro de `userId` esquecido)
+
+---
+
+## Estado da execução (24/07/2026)
+
+### Verificado contra o banco real
+
+`.env.local` já estava preenchido, então deu para ir além do scaffolding:
+
+- Migration `0000` gerada e aplicada — 6 tabelas com colunas, índices e FKs corretos.
+- Migration `0001` aplicada — RLS ligado e 6 policies de dono (`auth.uid() = user_id`;
+  `note_tags` deriva a posse da nota). Confirmado via `pg_policies`.
+- Smoke test da camada de dados: insert → select (filtrado por `userId` + `deletedAt`)
+  → soft-delete → cleanup, tudo OK. O role do pooler ignora RLS, exatamente como o
+  modelo §2.6 assume — a autorização real é o filtro por `userId` no código.
+- Middleware testado em runtime: rota protegida sem sessão redireciona (307) para
+  `/login`; `/login` e `/signup` respondem 200.
+
+### NÃO verificado (precisa de você)
+
+- **Login/signup/logout reais no navegador** e a persistência de nota pela UI. Precisa
+  de uma sessão autenticada de verdade, que não dá para simular por script.
+- **Google OAuth** — o código está pronto (`signInWithGoogle`, `/auth/callback`), mas o
+  provider precisa ser habilitado no painel. Ver runbook abaixo.
+- **Isolamento entre dois usuários** — o teste que mais importa fazer.
+
+### Runbook — o que só você pode fazer
+
+1. **Habilitar Google** (opcional, mas o botão já está na tela): painel do Supabase →
+   Authentication → Providers → Google → colar Client ID/Secret do Google Cloud, e
+   registrar `https://<ref>.supabase.co/auth/v1/callback` como redirect URI no Google.
+   Sem isso, use e-mail/senha normalmente.
+2. **Confirmação de e-mail**: por padrão o Supabase exige confirmar o e-mail antes do
+   primeiro login. Para testar rápido em dev, Authentication → Providers → Email →
+   desligar "Confirm email"; ou confirmar pelo link que chega no e-mail.
+3. **Testar**: `npm run dev`, criar conta em `/signup`, criar uma nota, recarregar,
+   confirmar que persistiu. Depois criar uma segunda conta e confirmar que ela não vê
+   as notas da primeira.
+4. **Popular dados (opcional)**: `npm run db:seed <user-id>` — o `<user-id>` está em
+   Authentication → Users.
+
+### Desvios em relação ao plano
+
+- **Clients do Supabase em `src/lib/supabase/`**, não em `src/server/auth/`. O browser
+  client não pode ser `server-only`; juntá-los sob `server/` seria enganoso. `server/auth/`
+  ficou só com `getCurrentUser`/`requireUser`.
+- **`DIRECT_URL` aponta para o session pooler (porta 5432), não para o host direto.** O
+  host `db.<ref>.supabase.co` é IPv6-only e não resolve nesta rede (`ENOTFOUND`) — erro
+  clássico do Supabase. O session pooler (`...pooler.supabase.com:5432`) é IPv4 e roda
+  migrations sem problema. Já ajustado no `.env.local`.
+- **`queries.ts` + `actions.ts`** em vez de `queries.ts` + `mutations.ts`. As mutações
+  são Server Actions (`'use server'`), invocáveis do cliente; separei-as das leituras
+  `server-only` por essa fronteira, não por serem leitura/escrita.
+- **Página virou Server Component** (`(app)/page.tsx`) que carrega as notas e passa para
+  o `NotesWorkspace` (client). A `NavSidebar` subiu para dentro do workspace e agora
+  mostra nome/e-mail reais do usuário, com botão de logout.
+- **`useNotes(initialNotes)`** agora tem escrita otimista + debounce de 800ms + rollback.
+  É a versão mínima; a fase 3 troca por TanStack Query mantendo a assinatura.
+- **RLS já vinha ligado** nas tabelas novas; a migration `0001` reforça (idempotente) e
+  adiciona as policies que faltavam.
+- **Comentários do `schema.ts` ficam em ASCII** — backticks + acentos no arquivo
+  dispararam um bug de parse do `tsc` (template literal fantasma). Mantidos sem acento
+  de propósito.

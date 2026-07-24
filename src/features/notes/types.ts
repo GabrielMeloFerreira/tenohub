@@ -1,22 +1,9 @@
-import type { JSONContent } from '@tiptap/react'
+import type { notes } from '@/server/db/schema'
 
-export type Note = {
-  id: string
-  title: string
-  /**
-   * Documento do TipTap em JSON — nunca HTML. Permite extrair texto puro para busca,
-   * contar palavras e transformar sem parsear string (ver docs/plans/00-roadmap.md).
-   */
-  content: JSONContent
-  createdAt: Date
-  updatedAt: Date
-}
-
-/*
- * Fase 2: este arquivo vira a fachada do schema do Drizzle, e os componentes
- * continuam importando daqui — nunca de `@/server/db`.
- *
- *   import type { notes } from '@/server/db/schema'
- *   export type Note = typeof notes.$inferSelect
- *   export type NewNote = typeof notes.$inferInsert
+/**
+ * Fachada do schema do Drizzle. Os componentes importam `Note` daqui, nunca de
+ * `@/server/db` — é `import type`, então some no build, mas manter a fachada evita que
+ * alguém troque por um import de valor e arraste código de servidor para o bundle.
  */
+export type Note = typeof notes.$inferSelect
+export type NewNote = typeof notes.$inferInsert

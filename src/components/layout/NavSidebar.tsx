@@ -1,7 +1,9 @@
 'use client'
 
 import Image from 'next/image'
-import { Calendar, CheckSquare, NotebookText, Plus, Search, Settings } from 'lucide-react'
+import { Calendar, CheckSquare, LogOut, NotebookText, Plus, Search, Settings } from 'lucide-react'
+
+import { signOut } from '@/features/auth/server/actions'
 
 import {
   Sidebar,
@@ -25,11 +27,12 @@ const navItems: { label: string; icon: typeof NotebookText; view: View }[] = [
 
 interface NavSidebarProps {
   view: View
+  user: { name: string; email: string }
   onChangeView: (view: View) => void
   onCreateNote: () => void
 }
 
-export default function NavSidebar({ view, onChangeView, onCreateNote }: NavSidebarProps) {
+export default function NavSidebar({ view, user, onChangeView, onCreateNote }: NavSidebarProps) {
   return (
     <Sidebar collapsible="none" className="h-svh shrink-0 border-r border-border">
       <SidebarHeader className="p-3">
@@ -42,8 +45,8 @@ export default function NavSidebar({ view, onChangeView, onCreateNote }: NavSide
             className="size-10 shrink-0 rounded-md object-cover"
           />
           <div className="flex min-w-0 flex-col text-sm">
-            <span className="truncate font-medium text-foreground">Gabriel de Melo</span>
-            <span className="truncate text-xs text-muted-foreground">Pro · 14 dias restantes</span>
+            <span className="truncate font-medium text-foreground">{user.name}</span>
+            <span className="truncate text-xs text-muted-foreground">{user.email}</span>
           </div>
         </div>
 
@@ -102,6 +105,14 @@ export default function NavSidebar({ view, onChangeView, onCreateNote }: NavSide
               <Settings />
               <span>Configurações</span>
             </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <form action={signOut} className="w-full">
+              <SidebarMenuButton type="submit">
+                <LogOut />
+                <span>Sair</span>
+              </SidebarMenuButton>
+            </form>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
