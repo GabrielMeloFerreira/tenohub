@@ -1,12 +1,13 @@
 'use server'
 
-import { and, eq } from 'drizzle-orm'
+import { and, desc, eq, isNull } from 'drizzle-orm'
 import type { JSONContent } from '@tiptap/react'
 
 import { db } from '@/server/db'
 import { notes } from '@/server/db/schema'
 import { requireUser } from '@/server/auth'
 import { countWords, extractPlainText } from '../utils'
+import type { Note } from '../types'
 import {
   createNoteSchema,
   noteIdSchema,
@@ -21,17 +22,39 @@ function searchFields(content: JSONContent) {
   return { plainText, wordCount: countWords(plainText) }
 }
 
+/** Listagem chamável do cliente — é o queryFn do TanStack Query (refetch, offline). */
+export async function listNotes(): Promise<Note[]> {
+  const user = await requireUser()
+  return db
+    .select()
+    .from(notes)
+    .where(and(eq(notes.userId, user.id), isNull(notes.deletedAt)))
+    .orderBy(desc(notes.updatedAt))
+}
+
 export async function createNote(input: CreateNoteInput) {
   const user = await requireUser()
   const data = createNoteSchema.parse(input)
 
-  await db.insert(notes).values({
-    id: data.id,
-    userId: user.id,
-    title: data.title,
-    content: data.content,
-    ...searchFields(data.content),
-  })
+  // Upsert por id (idempotente). O id vem do cliente, então um retry da fila offline
+  // reenvia o mesmo createNote sem duplicar a nota. Ver docs/plans/03-sync-offline.md.
+  await db
+    .insert(notes)
+    .values({
+      id: data.id,
+      userId: user.id,
+      title: data.title,
+      content: data.content,
+      ...searchFields(data.content),
+    })
+    .onConflictDoUpdate({
+      target: notes.id,
+      set: {
+        title: data.title,
+        content: data.content,
+        ...searchFields(data.content),
+      },
+    })
 }
 
 export async function updateNote(input: UpdateNoteInput) {

@@ -1,9 +1,12 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { JSONContent } from '@tiptap/react'
 
 import { newId } from '@/lib/id'
+import { mutationKeys, queryKeys } from '@/lib/query-keys'
+import type { CreateVars, DeleteVars, UpdateVars } from '@/lib/query-client'
 import * as actions from '../server/actions'
 import type { Note } from '../types'
 import { emptyDoc } from '../utils'
@@ -13,16 +16,28 @@ const SAVE_DEBOUNCE_MS = 800
 type Patch = { title?: string; content?: JSONContent }
 
 /**
- * CRUD de notas com escrita otimista, respaldado pelas Server Actions.
+ * CRUD de notas sobre o cache do TanStack Query, com escrita otimista e persistencia
+ * via fila de mutacoes (docs/plans/03-sync-offline.md).
  *
- * Fase 3 troca este miolo por TanStack Query + fila de mutações offline — a assinatura
- * pública não muda, então os componentes não são tocados. O debounce e o rollback aqui
- * são a versão mínima do que o TanStack fará de forma mais robusta.
+ * As mutations sao definidas por chave em makeQueryClient (lib/query-client.ts) — aqui
+ * so as disparamos. A escrita no cache e imediata para o input de titulo (controlado)
+ * ficar responsivo; o envio ao servidor e debounced.
  */
 export function useNotes(initialNotes: Note[]) {
-  const [notes, setNotes] = useState<Note[]>(initialNotes)
+  const qc = useQueryClient()
+  const listKey = queryKeys.notes.list()
 
-  // Timers e patches acumulados por nota, para não bater no banco a cada tecla.
+  const { data: notes = [] } = useQuery({
+    queryKey: listKey,
+    queryFn: () => actions.listNotes(),
+    initialData: initialNotes,
+  })
+
+  const createMut = useMutation<void, Error, CreateVars>({ mutationKey: mutationKeys.notes.create })
+  const updateMut = useMutation<void, Error, UpdateVars>({ mutationKey: mutationKeys.notes.update })
+  const deleteMut = useMutation<void, Error, DeleteVars>({ mutationKey: mutationKeys.notes.delete })
+
+  // Debounce de persistencia por nota.
   const timers = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map())
   const pending = useRef<Map<string, Patch>>(new Map())
 
@@ -31,21 +46,22 @@ export function useNotes(initialNotes: Note[]) {
     return () => map.forEach(clearTimeout)
   }, [])
 
-  const flush = useCallback((id: string) => {
-    const patch = pending.current.get(id)
-    pending.current.delete(id)
-    timers.current.delete(id)
-    if (!patch) return
-    actions.updateNote({ id, ...patch }).catch((err) => {
-      console.error('Falha ao salvar nota', id, err)
-    })
-  }, [])
+  const flush = useCallback(
+    (id: string) => {
+      const patch = pending.current.get(id)
+      pending.current.delete(id)
+      timers.current.delete(id)
+      if (!patch) return
+      updateMut.mutate({ id, patch })
+    },
+    [updateMut]
+  )
 
   const createNote = useCallback((): Note => {
     const now = new Date()
     const note: Note = {
       id: newId(),
-      userId: '', // preenchido no servidor a partir da sessão; irrelevante no cliente
+      userId: '', // preenchido no servidor a partir da sessao
       folderId: null,
       title: '',
       content: emptyDoc(),
@@ -57,17 +73,15 @@ export function useNotes(initialNotes: Note[]) {
       updatedAt: now,
       deletedAt: null,
     }
-    setNotes((prev) => [note, ...prev])
-    actions.createNote({ id: note.id, title: note.title, content: note.content }).catch((err) => {
-      console.error('Falha ao criar nota', err)
-      setNotes((prev) => prev.filter((n) => n.id !== note.id))
-    })
+    createMut.mutate(note) // onMutate adiciona ao cache
     return note
-  }, [])
+  }, [createMut])
 
   const updateNote = useCallback(
     (id: string, patch: Patch) => {
-      setNotes((prev) =>
+      // Escrita imediata no cache: mantem o input de titulo (controlado por note.title)
+      // responsivo e atualiza o preview da sidebar ao vivo.
+      qc.setQueryData<Note[]>(listKey, (prev = []) =>
         prev.map((n) => (n.id === id ? { ...n, ...patch, updatedAt: new Date() } : n))
       )
 
@@ -76,17 +90,15 @@ export function useNotes(initialNotes: Note[]) {
       if (existing) clearTimeout(existing)
       timers.current.set(id, setTimeout(() => flush(id), SAVE_DEBOUNCE_MS))
     },
-    [flush]
+    [qc, listKey, flush]
   )
 
-  const deleteNote = useCallback((id: string) => {
-    const snapshot = notes
-    setNotes((prev) => prev.filter((n) => n.id !== id))
-    actions.deleteNote({ id }).catch((err) => {
-      console.error('Falha ao excluir nota', id, err)
-      setNotes(snapshot)
-    })
-  }, [notes])
+  const deleteNote = useCallback(
+    (id: string) => {
+      deleteMut.mutate({ id })
+    },
+    [deleteMut]
+  )
 
   return { notes, createNote, updateNote, deleteNote }
 }
