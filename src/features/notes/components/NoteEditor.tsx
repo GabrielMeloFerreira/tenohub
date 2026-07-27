@@ -13,14 +13,17 @@ interface NoteEditorProps {
   note: Note | null
   onChangeTitle: (title: string) => void
   onChangeContent: (content: JSONContent) => void
+  onFlush: () => void
 }
 
-export default function NoteEditor({ note, onChangeTitle, onChangeContent }: NoteEditorProps) {
-  // Mantém o callback fresco sem recriar o editor a cada render do pai.
+export default function NoteEditor({ note, onChangeTitle, onChangeContent, onFlush }: NoteEditorProps) {
+  // Mantém os callbacks frescos sem recriar o editor a cada render do pai.
   const onChangeContentRef = useRef(onChangeContent)
+  const onFlushRef = useRef(onFlush)
   useEffect(() => {
     onChangeContentRef.current = onChangeContent
-  }, [onChangeContent])
+    onFlushRef.current = onFlush
+  }, [onChangeContent, onFlush])
 
   const editor = useEditor({
     extensions: [
@@ -34,6 +37,7 @@ export default function NoteEditor({ note, onChangeTitle, onChangeContent }: Not
     shouldRerenderOnTransaction: true,
     immediatelyRender: false,
     onUpdate: ({ editor }) => onChangeContentRef.current(editor.getJSON()),
+    onBlur: () => onFlushRef.current(),
   })
 
   // Recarrega o documento apenas quando troca a nota selecionada. Sem o guard por id,
@@ -63,6 +67,7 @@ export default function NoteEditor({ note, onChangeTitle, onChangeContent }: Not
         <input
           value={note.title}
           onChange={(event) => onChangeTitle(event.target.value)}
+          onBlur={onFlush}
           placeholder="Título da página"
           className="mt-2 w-full bg-transparent text-3xl font-bold text-foreground outline-none placeholder:text-muted-foreground/50"
         />

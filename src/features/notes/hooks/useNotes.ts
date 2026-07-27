@@ -57,6 +57,17 @@ export function useNotes(initialNotes: Note[]) {
     [updateMut]
   )
 
+  /** Persiste agora, sem esperar o debounce. Usado no blur e ao trocar de nota. */
+  const flushNote = useCallback(
+    (id: string | null) => {
+      if (!id) return
+      const t = timers.current.get(id)
+      if (t) clearTimeout(t)
+      flush(id)
+    },
+    [flush]
+  )
+
   const createNote = useCallback((): Note => {
     const now = new Date()
     const note: Note = {
@@ -100,5 +111,5 @@ export function useNotes(initialNotes: Note[]) {
     [deleteMut]
   )
 
-  return { notes, createNote, updateNote, deleteNote }
+  return { notes, createNote, updateNote, deleteNote, flushNote }
 }
