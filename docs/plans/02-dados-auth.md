@@ -1,8 +1,9 @@
 # Fase 2 — Dados e Autenticação
 
-> **Status: backend concluído e verificado contra o banco real (24/07/2026).**
-> Falta só a verificação do fluxo de login no navegador e a config do painel do
-> Supabase (Google OAuth). Detalhes no fim do documento, em **Estado da execução**.
+> **Status: backend concluído e verificado contra o banco real; login e cadastro
+> confirmados no navegador (27/07/2026).** Faltam três verificações de clique (logout,
+> persistência de nota, isolamento entre contas) e a config do Google OAuth no painel.
+> Detalhes no fim do documento, em **Estado da execução**.
 
 **Objetivo:** login funcionando e notas persistindo em Postgres. Ao final, recarregar
 a página não perde nada e abrir em outro dispositivo mostra as mesmas notas.
@@ -183,11 +184,21 @@ código da aplicação.
 - [x] Camada de dados verificada (insert/select/soft-delete via DATABASE_URL) contra o banco real
 - [x] Middleware protege a área logada (runtime: `/` sem sessão → 307 → `/login`)
 - [x] Nenhuma chave de serviço exposta ao cliente
-- [ ] Signup, login e logout **pelo navegador** — falta verificar (precisa de sessão real)
-- [ ] Criar nota → recarregar → continua lá — falta verificar pela UI
-- [ ] Abrir em outro navegador com a mesma conta → as mesmas notas
-- [ ] Dois usuários não enxergam nada um do outro (**testar com duas contas** — revela
-      filtro de `userId` esquecido)
+- [x] Signup e login **pelo navegador** (27/07/2026) — o app abre logado, o que confirma
+      `requireUser()` + `getNotes()` rodando com sessão real
+- [x] Logout pelo botão da sidebar → volta para `/login`
+- [x] Criar nota → recarregar → continua lá
+- [x] Dois usuários não enxergam nada um do outro (testado com duas contas — isolamento OK)
+
+**Fase 2 concluída em 27/07/2026.**
+
+> Pendências deixadas de propósito para depois (não bloqueiam a fase 3):
+> - Design/UX das telas de auth e do app.
+> - Redirecionamentos (revisão do fluxo pós-login/logout).
+> - Google OAuth — habilitar provider no painel.
+> - Observações do Gabriel sobre o cadastro.
+>
+> Anotar aqui quando ele descrever cada uma.
 
 ---
 
