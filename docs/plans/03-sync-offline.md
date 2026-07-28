@@ -123,10 +123,20 @@ a cada escrita, e serializar as mutations por nota (`scope`). É viável, mas o 
 concorrente **não é verificável sem dois dispositivos/sessões**, e o cenário (mesmo
 usuário, duas telas, mesma nota, uma offline) é raríssimo em MVP single-user.
 
-O LWW atual (a última escrita que chega ao servidor vence) cobre o caso comum. Quando
-concorrência real virar necessidade — colaboração — a resposta é **Yjs no campo
-`content`**, e nada desta fase precisa ser refeito. Retomar aqui antes disso só se o
-próprio Gabriel esbarrar no problema com frequência.
+O LWW atual (a última escrita que chega ao servidor vence) cobre o caso comum.
+
+**Direção definida (28/07/2026): modelo Notion, sem Yjs.** Quando a 3.5 for retomada, o
+alvo é **LWW por bloco/campo** (granularidade fina, como o Notion), NÃO CRDT. O Gabriel
+descartou Yjs de propósito: colaboração offline simultânea no mesmo item é caso raríssimo
+para um app de notas, e não justifica a complexidade do CRDT. Isso mantém o modelo
+inteiro como servidor-autoritativo + fila de operações + última-escrita-vence — só que a
+unidade de conflito passa de "nota inteira" para "bloco/campo".
+
+Implicação a lembrar: hoje o `content` é um blob `jsonb` sincronizado como unidade. O
+modelo Notion exige sincronizar em granularidade de bloco (operações por nó do
+ProseMirror, ou blocos como linhas separadas). Essa é a mudança de fundo da 3.5 — não é
+trivial, mas é MUITO menor que CRDT, e o `content` já ser TipTap/ProseMirror (block-based)
+ajuda. Para single-user, o LWW por nota atual provavelmente basta por um bom tempo.
 
 **Limitação, e é bom ser honesto sobre ela:** se a mesma nota for editada em dois
 dispositivos offline simultaneamente, uma das versões perde. Para uso pessoal e single
