@@ -4,7 +4,7 @@ import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 
 import { createClient } from '@/lib/supabase/server'
-import { loginSchema, signupSchema } from '../schema'
+import { emailSchema, loginSchema, newPasswordSchema, signupSchema } from '../schema'
 
 export type AuthState = { error?: string } | null
 
@@ -54,6 +54,34 @@ export async function signup(_prev: AuthState, formData: FormData): Promise<Auth
 
   await supabase.auth.signOut()
   redirect('/login?registered=1')
+}
+
+export async function requestPasswordReset(_prev: AuthState, formData: FormData): Promise<AuthState> {
+  const parsed = emailSchema.safeParse(formData.get('email'))
+  if (!parsed.success) return { error: 'E-mail invalido.' }
+
+  const supabase = await createClient()
+  await supabase.auth.resetPasswordForEmail(parsed.data, {
+    redirectTo: `${await origin()}/auth/callback?next=/reset-password`,
+  })
+
+  redirect('/forgot-password?sent=1')
+}
+
+export async function updatePassword(_prev: AuthState, formData: FormData): Promise<AuthState> {
+  const parsed = newPasswordSchema.safeParse({
+    password: formData.get('password'),
+    confirmPassword: formData.get('confirmPassword'),
+  })
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? 'Dados invalidos.' }
+  }
+
+  const supabase = await createClient()
+  const { error } = await supabase.auth.updateUser({ password: parsed.data.password })
+  if (error) return { error: error.message }
+
+  redirect('/')
 }
 
 export async function signInWithGoogle() {

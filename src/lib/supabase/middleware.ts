@@ -37,8 +37,8 @@ export async function updateSession(request: NextRequest) {
 
   const { pathname } = request.nextUrl
   const isAuthPage = pathname.startsWith('/login') || pathname.startsWith('/signup')
-  // /auth/* (callback do OAuth, troca de código) roda antes de existir sessão.
-  const isPublicRoute = isAuthPage || pathname.startsWith('/auth')
+  const isPublicRoute =
+    isAuthPage || pathname.startsWith('/auth') || pathname.startsWith('/forgot-password')
 
   // Sem usuário e fora das rotas públicas → manda para o login.
   if (!user && !isPublicRoute) {

@@ -22,3 +22,13 @@ export const signupSchema = z
     message: 'As senhas nao conferem.',
     path: ['confirmPassword'],
   })
+
+export const newPasswordSchema = z
+  .object({
+    password: passwordSchema,
+    confirmPassword: z.string(),
+  })
+  .refine((d) => d.password === d.confirmPassword, {
+    message: 'As senhas nao conferem.',
+    path: ['confirmPassword'],
+  })

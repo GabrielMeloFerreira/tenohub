@@ -1,4 +1,5 @@
 import AuthForm from '@/features/auth/components/AuthForm'
+import type { NoticeData } from '@/features/auth/components/form'
 
 export default async function LoginPage({
   searchParams,
@@ -7,10 +8,10 @@ export default async function LoginPage({
 }) {
   const sp = await searchParams
 
-  const notice = sp.registered
-    ? { type: 'success' as const, text: 'Conta criada com sucesso! Faca login para continuar.' }
+  const notice: NoticeData | null = sp.registered
+    ? { type: 'success', text: 'Conta criada com sucesso! Faca login para continuar.' }
     : sp.error
-      ? { type: 'error' as const, text: 'Nao foi possivel autenticar. Tente novamente.' }
+      ? { type: 'error', text: 'Nao foi possivel autenticar. Tente novamente.' }
       : null
 
   return <AuthForm mode="login" notice={notice} />

@@ -3,15 +3,13 @@
 import Link from 'next/link'
 import { useActionState } from 'react'
 
-import { cn } from '@/lib/utils'
 import { login, signInWithGoogle, signup, type AuthState } from '../server/actions'
+import { Notice, authInputClass, type NoticeData } from './form'
 import GoogleIcon from './GoogleIcon'
-
-type Notice = { type: 'success' | 'error'; text: string } | null
 
 interface AuthFormProps {
   mode: 'login' | 'signup'
-  notice?: Notice
+  notice?: NoticeData | null
 }
 
 const copy = {
@@ -31,9 +29,6 @@ const copy = {
   },
 } as const
 
-const inputClass =
-  'rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus-visible:border-ring'
-
 export default function AuthForm({ mode, notice = null }: AuthFormProps) {
   const isSignup = mode === 'signup'
   const action = isSignup ? signup : login
@@ -44,18 +39,7 @@ export default function AuthForm({ mode, notice = null }: AuthFormProps) {
     <div className="mx-auto flex min-h-svh w-full max-w-sm flex-col justify-center gap-6 px-4">
       <h1 className="text-2xl font-semibold text-foreground">{t.title}</h1>
 
-      {notice && (
-        <p
-          className={cn(
-            'rounded-md border px-3 py-2 text-sm',
-            notice.type === 'success'
-              ? 'border-green-600/40 bg-green-600/10 text-green-500'
-              : 'border-destructive/40 bg-destructive/10 text-destructive'
-          )}
-        >
-          {notice.text}
-        </p>
-      )}
+      <Notice notice={notice} />
 
       <form action={signInWithGoogle}>
         <button
@@ -80,7 +64,7 @@ export default function AuthForm({ mode, notice = null }: AuthFormProps) {
           required
           autoComplete="email"
           placeholder="E-mail"
-          className={inputClass}
+          className={authInputClass}
         />
         <input
           name="password"
@@ -89,7 +73,7 @@ export default function AuthForm({ mode, notice = null }: AuthFormProps) {
           minLength={isSignup ? 6 : undefined}
           autoComplete={isSignup ? 'new-password' : 'current-password'}
           placeholder="Senha"
-          className={inputClass}
+          className={authInputClass}
         />
 
         {isSignup && (
@@ -100,7 +84,7 @@ export default function AuthForm({ mode, notice = null }: AuthFormProps) {
               required
               autoComplete="new-password"
               placeholder="Confirmar senha"
-              className={inputClass}
+              className={authInputClass}
             />
             <p className="text-xs text-muted-foreground">
               Minimo 6 caracteres e ao menos um caractere especial.
@@ -108,7 +92,16 @@ export default function AuthForm({ mode, notice = null }: AuthFormProps) {
           </>
         )}
 
-        {state?.error && <p className="text-sm text-destructive">{state.error}</p>}
+        {!isSignup && (
+          <Link
+            href="/forgot-password"
+            className="self-end text-xs text-muted-foreground hover:text-foreground"
+          >
+            Esqueci minha senha
+          </Link>
+        )}
+
+        <Notice notice={state?.error ? { type: 'error', text: state.error } : null} />
 
         <button
           type="submit"
