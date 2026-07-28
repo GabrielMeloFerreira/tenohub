@@ -1,5 +1,8 @@
 import ResetPasswordForm from '@/features/auth/components/ResetPasswordForm'
+import { requireUser } from '@/server/auth'
 
-export default function ResetPasswordPage() {
+export default async function ResetPasswordPage() {
+  await requireUser()
+
   return <ResetPasswordForm />
 }
