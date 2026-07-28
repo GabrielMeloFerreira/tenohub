@@ -190,7 +190,8 @@ bloco de trabalho, separado, se ele quiser.
 - [x] Cache persistido em IndexedDB (superjson preserva Date); fila de mutações
 - [x] `createNote` idempotente (upsert) — retry não duplica
 - [x] Indicador de status refletindo online/salvando/offline
-- [ ] **Verificar em navegador com modo avião** (roteiro abaixo) — precisa de você
+- [x] **Verificado em navegador (28/07/2026)**: wifi desligado → edições → wifi religado
+      → alterações subiram sozinhas. Fila de mutações drenando ao reconectar confirmada.
 - [~] Conflito entre dois dispositivos: adiado (3.5), LWW por ora
 - [~] Cold-start offline (reload sem rede): depende da 3.7 (PWA), adiada
 
