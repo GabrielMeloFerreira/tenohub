@@ -2,14 +2,9 @@
 
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { z } from 'zod'
 
 import { createClient } from '@/lib/supabase/server'
-
-const credentialsSchema = z.object({
-  email: z.email(),
-  password: z.string().min(8, 'A senha precisa de ao menos 8 caracteres.'),
-})
+import { loginSchema, signupSchema } from '../schema'
 
 export type AuthState = { error?: string } | null
 
@@ -19,11 +14,11 @@ async function origin() {
 }
 
 export async function login(_prev: AuthState, formData: FormData): Promise<AuthState> {
-  const parsed = credentialsSchema.safeParse({
+  const parsed = loginSchema.safeParse({
     email: formData.get('email'),
     password: formData.get('password'),
   })
-  if (!parsed.success) return { error: 'E-mail ou senha inválidos.' }
+  if (!parsed.success) return { error: 'E-mail ou senha invalidos.' }
 
   const supabase = await createClient()
   const { error } = await supabase.auth.signInWithPassword(parsed.data)
@@ -33,22 +28,32 @@ export async function login(_prev: AuthState, formData: FormData): Promise<AuthS
 }
 
 export async function signup(_prev: AuthState, formData: FormData): Promise<AuthState> {
-  const parsed = credentialsSchema.safeParse({
+  const parsed = signupSchema.safeParse({
     email: formData.get('email'),
     password: formData.get('password'),
+    confirmPassword: formData.get('confirmPassword'),
   })
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? 'Dados inválidos.' }
+    return { error: parsed.error.issues[0]?.message ?? 'Dados invalidos.' }
   }
 
   const supabase = await createClient()
-  const { error } = await supabase.auth.signUp({
-    ...parsed.data,
+  const { data, error } = await supabase.auth.signUp({
+    email: parsed.data.email,
+    password: parsed.data.password,
     options: { emailRedirectTo: `${await origin()}/auth/callback` },
   })
-  if (error) return { error: error.message }
 
-  redirect('/')
+  if (error) {
+    const duplicate = /already registered/i.test(error.message)
+    return { error: duplicate ? 'Este e-mail ja esta cadastrado.' : error.message }
+  }
+  if (data.user && data.user.identities?.length === 0) {
+    return { error: 'Este e-mail ja esta cadastrado.' }
+  }
+
+  await supabase.auth.signOut()
+  redirect('/login?registered=1')
 }
 
 export async function signInWithGoogle() {
