@@ -81,7 +81,8 @@ export async function updatePassword(_prev: AuthState, formData: FormData): Prom
   const { error } = await supabase.auth.updateUser({ password: parsed.data.password })
   if (error) return { error: error.message }
 
-  redirect('/')
+  await supabase.auth.signOut()
+  redirect('/login?reset=1')
 }
 
 export async function signInWithGoogle() {
