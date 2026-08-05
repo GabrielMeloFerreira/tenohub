@@ -4,6 +4,9 @@ import { useCallback } from 'react'
 import type { JSONContent } from '@tiptap/react'
 
 import NavSidebar from '@/components/layout/NavSidebar'
+import FolderList from '@/features/folders/components/FolderList'
+import { useFolders } from '@/features/folders/hooks/useFolders'
+import type { FolderWithCount } from '@/features/folders/types'
 import { useUiStore } from '@/stores/ui-store'
 import { useNotes } from '../hooks/useNotes'
 import type { Note } from '../types'
@@ -13,11 +16,17 @@ import SyncStatus from './SyncStatus'
 
 interface NotesWorkspaceProps {
   initialNotes: Note[]
+  initialFolders: FolderWithCount[]
   user: { name: string; email: string }
 }
 
-export default function NotesWorkspace({ initialNotes, user }: NotesWorkspaceProps) {
+export default function NotesWorkspace({
+  initialNotes,
+  initialFolders,
+  user,
+}: NotesWorkspaceProps) {
   const { notes, createNote, updateNote, flushNote } = useNotes(initialNotes)
+  const { folders, createFolder, renameFolder, deleteFolder } = useFolders(initialFolders)
 
   const view = useUiStore((s) => s.view)
   const selectedNoteId = useUiStore((s) => s.selectedNoteId)
@@ -63,6 +72,14 @@ export default function NotesWorkspace({ initialNotes, user }: NotesWorkspacePro
       <NavSidebar
         view={view}
         user={user}
+        folders={
+          <FolderList
+            folders={folders}
+            onCreate={createFolder}
+            onRename={renameFolder}
+            onDelete={deleteFolder}
+          />
+        }
         onChangeView={setView}
         onCreateNote={handleCreateNote}
       />

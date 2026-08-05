@@ -6,14 +6,21 @@ import { useState } from 'react'
 
 import { makeQueryClient } from '@/lib/query-client'
 import { createIdbPersister } from '@/lib/idb-persister'
+import { registerNoteMutations } from '@/features/notes/query'
+import { registerFolderMutations } from '@/features/folders/query'
 
-// Suba esta versao quando o formato do cache mudar: invalida caches antigos e evita
-// hidratar dados em formato velho (o "fantasma" da fase 3.2).
 const CACHE_BUSTER = 'v1'
 const THIRTY_DAYS = 1000 * 60 * 60 * 24 * 30
 
+function buildQueryClient() {
+  const qc = makeQueryClient()
+  registerNoteMutations(qc)
+  registerFolderMutations(qc)
+  return qc
+}
+
 export default function Providers({ children }: { children: React.ReactNode }) {
-  const [queryClient] = useState(makeQueryClient)
+  const [queryClient] = useState(buildQueryClient)
   const [persister] = useState(createIdbPersister)
 
   return (
@@ -21,8 +28,6 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       client={queryClient}
       persistOptions={{ persister, maxAge: THIRTY_DAYS, buster: CACHE_BUSTER }}
       onSuccess={() => {
-        // Cache restaurado do IndexedDB: retoma mutacoes que ficaram pausadas offline
-        // numa sessao anterior (reload/crash). Sao idempotentes, entao nao duplicam.
         queryClient.resumePausedMutations()
       }}
     >

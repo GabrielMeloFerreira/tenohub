@@ -11,7 +11,6 @@ import {
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -28,11 +27,18 @@ const navItems: { label: string; icon: typeof NotebookText; view: View }[] = [
 interface NavSidebarProps {
   view: View
   user: { name: string; email: string }
+  folders?: React.ReactNode
   onChangeView: (view: View) => void
   onCreateNote: () => void
 }
 
-export default function NavSidebar({ view, user, onChangeView, onCreateNote }: NavSidebarProps) {
+export default function NavSidebar({
+  view,
+  user,
+  folders,
+  onChangeView,
+  onCreateNote,
+}: NavSidebarProps) {
   return (
     <Sidebar collapsible="none" className="h-svh shrink-0 border-r border-border">
       <SidebarHeader className="p-3">
@@ -86,12 +92,8 @@ export default function NavSidebar({ view, user, onChangeView, onCreateNote }: N
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Pastas chegam na fase 4 (docs/plans/04-organizacao.md) */}
         <SidebarGroup>
-          <SidebarGroupLabel>Pastas</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <p className="px-2 text-xs text-muted-foreground">Em breve</p>
-          </SidebarGroupContent>
+          <SidebarGroupContent>{folders}</SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
 

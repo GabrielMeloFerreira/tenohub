@@ -6,7 +6,7 @@ import type { JSONContent } from '@tiptap/react'
 
 import { newId } from '@/lib/id'
 import { mutationKeys, queryKeys } from '@/lib/query-keys'
-import type { CreateVars, DeleteVars, UpdateVars } from '@/lib/query-client'
+import type { CreateNoteVars, DeleteNoteVars, UpdateNoteVars } from '../query'
 import * as actions from '../server/actions'
 import type { Note } from '../types'
 import { emptyDoc } from '../utils'
@@ -33,9 +33,9 @@ export function useNotes(initialNotes: Note[]) {
     initialData: initialNotes,
   })
 
-  const createMut = useMutation<void, Error, CreateVars>({ mutationKey: mutationKeys.notes.create })
-  const updateMut = useMutation<void, Error, UpdateVars>({ mutationKey: mutationKeys.notes.update })
-  const deleteMut = useMutation<void, Error, DeleteVars>({ mutationKey: mutationKeys.notes.delete })
+  const createMut = useMutation<void, Error, CreateNoteVars>({ mutationKey: mutationKeys.notes.create })
+  const updateMut = useMutation<void, Error, UpdateNoteVars>({ mutationKey: mutationKeys.notes.update })
+  const deleteMut = useMutation<void, Error, DeleteNoteVars>({ mutationKey: mutationKeys.notes.delete })
 
   // Debounce de persistencia por nota.
   const timers = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map())
