@@ -5,7 +5,7 @@ import { draggable } from '@atlaskit/pragmatic-drag-and-drop/element/adapter'
 
 import { cn } from '@/lib/utils'
 import type { Note } from '../types'
-import { extractPlainText } from '../utils'
+import { previewFromDoc } from '../utils'
 
 interface NoteCardProps {
   note: Note
@@ -29,7 +29,7 @@ export default function NoteCard({ note, isSelected, onSelect }: NoteCardProps) 
     })
   }, [note.id])
 
-  const preview = extractPlainText(note.content)
+  const preview = previewFromDoc(note.content)
 
   return (
     <button

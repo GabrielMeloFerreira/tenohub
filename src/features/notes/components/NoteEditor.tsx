@@ -13,7 +13,6 @@ import '../editor.css'
 interface NoteEditorProps {
   note: Note | null
   folders: FolderWithCount[]
-  onChangeTitle: (title: string) => void
   onChangeContent: (content: JSONContent) => void
   onMove: (folderId: string | null) => void
   onFlush: () => void
@@ -22,7 +21,6 @@ interface NoteEditorProps {
 export default function NoteEditor({
   note,
   folders,
-  onChangeTitle,
   onChangeContent,
   onMove,
   onFlush,
@@ -66,21 +64,6 @@ export default function NoteEditor({
     <div className="flex h-full w-full flex-col overflow-hidden">
       <header className="shrink-0 px-4 pt-4">
         <FolderPicker folders={folders} value={note.folderId} onChange={onMove} />
-
-        <input
-          value={note.title}
-          onChange={(event) => onChangeTitle(event.target.value)}
-          onBlur={onFlush}
-          placeholder="Título da página"
-          className="mt-3 w-full bg-transparent font-serif text-4xl font-semibold tracking-tight text-foreground outline-none placeholder:text-muted-foreground/40"
-        />
-
-        <button
-          type="button"
-          className="mt-2 mb-3 text-sm text-muted-foreground transition-colors hover:text-foreground"
-        >
-          + Adicionar tag
-        </button>
       </header>
 
       <ToolBar editor={editor} />

@@ -15,6 +15,23 @@
   line-height: 1.7;
 }
 
+.ProseMirror > :first-child {
+  font-family: var(--font-serif);
+  font-size: 2.25rem;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.25em;
+}
+
+.ProseMirror .is-empty::before {
+  content: attr(data-placeholder);
+  color: var(--color-muted-foreground);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
 .ProseMirror h1,
 .ProseMirror h2,
 .ProseMirror h3 {

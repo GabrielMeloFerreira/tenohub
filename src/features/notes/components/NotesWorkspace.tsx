@@ -9,6 +9,7 @@ import { useFolders } from '@/features/folders/hooks/useFolders'
 import type { FolderWithCount } from '@/features/folders/types'
 import { useUiStore } from '@/stores/ui-store'
 import { useNotes } from '../hooks/useNotes'
+import { titleFromDoc } from '../utils'
 import type { Note } from '../types'
 import NoteEditor from './NoteEditor'
 import NoteList from './NoteList'
@@ -77,16 +78,9 @@ export default function NotesWorkspace({
 
   const handleFlush = useCallback(() => flushNote(selectedNoteId), [flushNote, selectedNoteId])
 
-  const handleChangeTitle = useCallback(
-    (title: string) => {
-      if (selectedNoteId) updateNote(selectedNoteId, { title })
-    },
-    [selectedNoteId, updateNote]
-  )
-
   const handleChangeContent = useCallback(
     (content: JSONContent) => {
-      if (selectedNoteId) updateNote(selectedNoteId, { content })
+      if (selectedNoteId) updateNote(selectedNoteId, { content, title: titleFromDoc(content) })
     },
     [selectedNoteId, updateNote]
   )
@@ -124,7 +118,6 @@ export default function NotesWorkspace({
           <NoteEditor
             note={selectedNote}
             folders={folders}
-            onChangeTitle={handleChangeTitle}
             onChangeContent={handleChangeContent}
             onMove={handleMoveNote}
             onFlush={handleFlush}

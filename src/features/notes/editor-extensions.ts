@@ -3,6 +3,7 @@ import TextAlign from '@tiptap/extension-text-align'
 import Highlight from '@tiptap/extension-highlight'
 import TaskList from '@tiptap/extension-task-list'
 import TaskItem from '@tiptap/extension-task-item'
+import Placeholder from '@tiptap/extension-placeholder'
 
 import { Callout } from './extensions/callout'
 
@@ -23,4 +24,9 @@ export const editorExtensions = [
   TaskList,
   TaskItem.configure({ nested: true }),
   Callout,
+  Placeholder.configure({
+    showOnlyCurrent: false,
+    placeholder: ({ node, editor }) =>
+      editor.state.doc.firstChild === node ? 'Sem título' : '',
+  }),
 ]

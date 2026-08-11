@@ -1,11 +1,9 @@
 import type { JSONContent } from '@tiptap/react'
 
-/** Documento vazio do TipTap — o estado inicial de uma nota nova. */
 export function emptyDoc(): JSONContent {
   return { type: 'doc', content: [{ type: 'paragraph' }] }
 }
 
-/** Monta um documento simples a partir de texto puro. Usado só pelos mocks. */
 export function docFromText(text: string): JSONContent {
   return {
     type: 'doc',
@@ -13,25 +11,33 @@ export function docFromText(text: string): JSONContent {
   }
 }
 
-/**
- * Extrai texto puro do documento do TipTap.
- *
- * Na fase 2 isso passa a ser calculado ao salvar e persistido na coluna `plainText`,
- * que alimenta a busca full-text. Aqui roda no cliente só para o preview do card.
- */
+function collectText(node: JSONContent): string {
+  if (node.text) return node.text
+  return (node.content ?? []).map(collectText).join(' ')
+}
+
 export function extractPlainText(doc: JSONContent | undefined): string {
-  if (!doc) return ''
+  if (!doc?.content) return ''
+  return doc.content
+    .map(collectText)
+    .join(' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
 
-  let out = ''
-  const walk = (node: JSONContent) => {
-    if (node.text) out += node.text
-    node.content?.forEach(walk)
-    // blocos viram separador para "a.b" não colar como "ab"
-    if (node.type === 'paragraph' || node.type === 'heading') out += ' '
-  }
-  walk(doc)
+export function titleFromDoc(doc: JSONContent | undefined): string {
+  const first = doc?.content?.[0]
+  if (!first) return ''
+  return collectText(first).replace(/\s+/g, ' ').trim().slice(0, 200)
+}
 
-  return out.replace(/\s+/g, ' ').trim()
+export function previewFromDoc(doc: JSONContent | undefined): string {
+  const rest = doc?.content?.slice(1) ?? []
+  return rest
+    .map(collectText)
+    .join(' ')
+    .replace(/\s+/g, ' ')
+    .trim()
 }
 
 export function countWords(text: string): number {
