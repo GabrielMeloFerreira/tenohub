@@ -11,7 +11,6 @@ import {
   Highlighter,
   Italic,
   Lightbulb,
-  Link as LinkIcon,
   List,
   ListChecks,
   ListOrdered,
@@ -23,6 +22,7 @@ import {
 } from 'lucide-react'
 
 import { getButtonClass, getStatelessButtonClass } from '../styles'
+import LinkPopover from './LinkPopover'
 
 interface ToolBarProps {
   editor: Editor | null
@@ -54,17 +54,6 @@ export default function ToolBar({ editor }: ToolBarProps) {
     const chain = editor!.chain().focus()
     if (value === 'paragraph') chain.setParagraph().run()
     else chain.toggleHeading({ level: Number(value.slice(1)) as 1 | 2 | 3 }).run()
-  }
-
-  function setLink() {
-    const prev = editor!.getAttributes('link').href as string | undefined
-    const url = window.prompt('URL do link', prev ?? '')
-    if (url === null) return
-    if (url === '') {
-      editor!.chain().focus().unsetLink().run()
-      return
-    }
-    editor!.chain().focus().setLink({ href: url }).run()
   }
 
   return (
@@ -144,14 +133,7 @@ export default function ToolBar({ editor }: ToolBarProps) {
       >
         <Highlighter size={16} />
       </button>
-      <button
-        type="button"
-        title="Link"
-        onClick={setLink}
-        className={getButtonClass(editor.isActive('link'))}
-      >
-        <LinkIcon size={16} />
-      </button>
+      <LinkPopover editor={editor} />
 
       <Divider />
 
