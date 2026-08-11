@@ -72,7 +72,7 @@ export default function NoteEditor({
           onChange={(event) => onChangeTitle(event.target.value)}
           onBlur={onFlush}
           placeholder="Título da página"
-          className="mt-2 w-full bg-transparent text-3xl font-bold text-foreground outline-none placeholder:text-muted-foreground/50"
+          className="mt-3 w-full bg-transparent font-serif text-4xl font-semibold tracking-tight text-foreground outline-none placeholder:text-muted-foreground/40"
         />
 
         <button

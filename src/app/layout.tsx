@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import { Fraunces, Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
 
 const geistSans = Geist({
@@ -10,6 +10,12 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: '--font-geist-mono',
   subsets: ['latin'],
+})
+
+const fraunces = Fraunces({
+  variable: '--font-fraunces',
+  subsets: ['latin'],
+  style: ['normal', 'italic'],
 })
 
 export const metadata: Metadata = {
@@ -23,9 +29,10 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    // Dark-first por decisão de produto. O toggle claro/escuro chega na fase 5.
     <html lang="pt-BR" className="dark">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-hidden`}>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} antialiased overflow-hidden`}
+      >
         {children}
       </body>
     </html>
