@@ -7,8 +7,14 @@ import {
   AlignLeft,
   AlignRight,
   Bold,
+  Code,
+  Highlighter,
   Italic,
-  Link,
+  Link as LinkIcon,
+  List,
+  ListChecks,
+  ListOrdered,
+  Quote,
   Redo,
   Strikethrough,
   Underline,
@@ -25,11 +31,43 @@ function Divider() {
   return <div aria-hidden="true" className="mx-1 my-1 w-px self-stretch bg-border" />
 }
 
+const blockOptions = [
+  { value: 'paragraph', label: 'Texto' },
+  { value: 'h1', label: 'Titulo 1' },
+  { value: 'h2', label: 'Titulo 2' },
+  { value: 'h3', label: 'Titulo 3' },
+]
+
 export default function ToolBar({ editor }: ToolBarProps) {
   if (!editor) return null
 
+  const currentBlock = editor.isActive('heading', { level: 1 })
+    ? 'h1'
+    : editor.isActive('heading', { level: 2 })
+      ? 'h2'
+      : editor.isActive('heading', { level: 3 })
+        ? 'h3'
+        : 'paragraph'
+
+  function setBlock(value: string) {
+    const chain = editor!.chain().focus()
+    if (value === 'paragraph') chain.setParagraph().run()
+    else chain.toggleHeading({ level: Number(value.slice(1)) as 1 | 2 | 3 }).run()
+  }
+
+  function setLink() {
+    const prev = editor!.getAttributes('link').href as string | undefined
+    const url = window.prompt('URL do link', prev ?? '')
+    if (url === null) return
+    if (url === '') {
+      editor!.chain().focus().unsetLink().run()
+      return
+    }
+    editor!.chain().focus().setLink({ href: url }).run()
+  }
+
   return (
-    <div className="sticky top-0 z-10 flex items-center gap-0.5 border-b border-border bg-background/95 px-4 py-1.5 backdrop-blur">
+    <div className="sticky top-0 z-10 flex flex-wrap items-center gap-0.5 border-b border-border bg-background/95 px-4 py-1.5 backdrop-blur">
       <button
         type="button"
         title="Desfazer"
@@ -51,6 +89,20 @@ export default function ToolBar({ editor }: ToolBarProps) {
 
       <Divider />
 
+      <select
+        value={currentBlock}
+        onChange={(e) => setBlock(e.target.value)}
+        className="rounded bg-transparent px-1.5 py-1 text-sm text-foreground outline-none hover:bg-muted"
+      >
+        {blockOptions.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
+        ))}
+      </select>
+
+      <Divider />
+
       <button
         type="button"
         title="Negrito"
@@ -61,7 +113,7 @@ export default function ToolBar({ editor }: ToolBarProps) {
       </button>
       <button
         type="button"
-        title="Itálico"
+        title="Italico"
         onClick={() => editor.chain().focus().toggleItalic().run()}
         className={getButtonClass(editor.isActive('italic'))}
       >
@@ -83,16 +135,71 @@ export default function ToolBar({ editor }: ToolBarProps) {
       >
         <Strikethrough size={16} />
       </button>
-      {/* Link precisa de popover para receber a URL — fase 5 (docs/plans/05-busca-editor.md) */}
-      <button type="button" title="Link (em breve)" disabled className={getStatelessButtonClass()}>
-        <Link size={16} />
+      <button
+        type="button"
+        title="Marca-texto"
+        onClick={() => editor.chain().focus().toggleHighlight().run()}
+        className={getButtonClass(editor.isActive('highlight'))}
+      >
+        <Highlighter size={16} />
+      </button>
+      <button
+        type="button"
+        title="Link"
+        onClick={setLink}
+        className={getButtonClass(editor.isActive('link'))}
+      >
+        <LinkIcon size={16} />
       </button>
 
       <Divider />
 
       <button
         type="button"
-        title="Alinhar à esquerda"
+        title="Lista com marcador"
+        onClick={() => editor.chain().focus().toggleBulletList().run()}
+        className={getButtonClass(editor.isActive('bulletList'))}
+      >
+        <List size={16} />
+      </button>
+      <button
+        type="button"
+        title="Lista numerada"
+        onClick={() => editor.chain().focus().toggleOrderedList().run()}
+        className={getButtonClass(editor.isActive('orderedList'))}
+      >
+        <ListOrdered size={16} />
+      </button>
+      <button
+        type="button"
+        title="Checklist"
+        onClick={() => editor.chain().focus().toggleTaskList().run()}
+        className={getButtonClass(editor.isActive('taskList'))}
+      >
+        <ListChecks size={16} />
+      </button>
+      <button
+        type="button"
+        title="Citacao"
+        onClick={() => editor.chain().focus().toggleBlockquote().run()}
+        className={getButtonClass(editor.isActive('blockquote'))}
+      >
+        <Quote size={16} />
+      </button>
+      <button
+        type="button"
+        title="Bloco de codigo"
+        onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+        className={getButtonClass(editor.isActive('codeBlock'))}
+      >
+        <Code size={16} />
+      </button>
+
+      <Divider />
+
+      <button
+        type="button"
+        title="Alinhar a esquerda"
         onClick={() => editor.chain().focus().setTextAlign('left').run()}
         className={getButtonClass(editor.isActive({ textAlign: 'left' }))}
       >
@@ -108,7 +215,7 @@ export default function ToolBar({ editor }: ToolBarProps) {
       </button>
       <button
         type="button"
-        title="Alinhar à direita"
+        title="Alinhar a direita"
         onClick={() => editor.chain().focus().setTextAlign('right').run()}
         className={getButtonClass(editor.isActive({ textAlign: 'right' }))}
       >

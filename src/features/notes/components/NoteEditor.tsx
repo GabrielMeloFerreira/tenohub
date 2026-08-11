@@ -2,10 +2,9 @@
 
 import { useEffect, useRef } from 'react'
 import { EditorContent, useEditor, type JSONContent } from '@tiptap/react'
-import StarterKit from '@tiptap/starter-kit'
-import TextAlign from '@tiptap/extension-text-align'
 
 import FolderPicker from '@/features/folders/components/FolderPicker'
+import { editorExtensions } from '../editor-extensions'
 import type { FolderWithCount } from '@/features/folders/types'
 import type { Note } from '../types'
 import ToolBar from './ToolBar'
@@ -28,7 +27,6 @@ export default function NoteEditor({
   onMove,
   onFlush,
 }: NoteEditorProps) {
-  // Mantém os callbacks frescos sem recriar o editor a cada render do pai.
   const onChangeContentRef = useRef(onChangeContent)
   const onFlushRef = useRef(onFlush)
   useEffect(() => {
@@ -37,13 +35,7 @@ export default function NoteEditor({
   }, [onChangeContent, onFlush])
 
   const editor = useEditor({
-    extensions: [
-      StarterKit,
-      TextAlign.configure({
-        types: ['heading', 'paragraph'],
-        alignments: ['left', 'center', 'right', 'justify'],
-      }),
-    ],
+    extensions: editorExtensions,
     content: note?.content ?? '',
     shouldRerenderOnTransaction: true,
     immediatelyRender: false,
