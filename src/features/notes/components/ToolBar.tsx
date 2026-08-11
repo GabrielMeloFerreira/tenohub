@@ -10,6 +10,7 @@ import {
   Code,
   Highlighter,
   Italic,
+  Lightbulb,
   Link as LinkIcon,
   List,
   ListChecks,
@@ -193,6 +194,14 @@ export default function ToolBar({ editor }: ToolBarProps) {
         className={getButtonClass(editor.isActive('codeBlock'))}
       >
         <Code size={16} />
+      </button>
+      <button
+        type="button"
+        title="Destaque (callout)"
+        onClick={() => editor.chain().focus().toggleWrap('callout').run()}
+        className={getButtonClass(editor.isActive('callout'))}
+      >
+        <Lightbulb size={16} />
       </button>
 
       <Divider />

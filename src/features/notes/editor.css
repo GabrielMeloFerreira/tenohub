@@ -105,3 +105,23 @@
   text-decoration: line-through;
   color: var(--color-muted-foreground);
 }
+
+.ProseMirror div[data-callout] {
+  position: relative;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  background-color: var(--color-muted);
+  padding: 0.85rem 1rem 0.85rem 2.75rem;
+}
+
+.ProseMirror div[data-callout]::before {
+  content: '💡';
+  position: absolute;
+  left: 0.85rem;
+  top: 0.75rem;
+  line-height: 1.4;
+}
+
+.ProseMirror div[data-callout] > * + * {
+  margin-top: 0.5em;
+}
