@@ -6,6 +6,7 @@ import type { Note } from './types'
 
 export type CreateNoteVars = Note
 export type UpdateNoteVars = { id: string; patch: { title?: string; content?: Note['content'] } }
+export type MoveNoteVars = { id: string; folderId: string | null }
 export type DeleteNoteVars = { id: string }
 
 const listKey = queryKeys.notes.list()
@@ -42,6 +43,25 @@ export function registerNoteMutations(qc: QueryClient) {
     },
   })
 
+  qc.setMutationDefaults(mutationKeys.notes.move, {
+    mutationFn: ({ id, folderId }: MoveNoteVars) => noteActions.moveNote({ id, folderId }),
+    onMutate: async ({ id, folderId }: MoveNoteVars) => {
+      await qc.cancelQueries({ queryKey: listKey })
+      const prev = getList(qc)
+      qc.setQueryData<Note[]>(
+        listKey,
+        prev.map((n) => (n.id === id ? { ...n, folderId, updatedAt: new Date() } : n))
+      )
+      return { prev }
+    },
+    onError: (_e, _vars, ctx) => {
+      if (ctx?.prev) qc.setQueryData(listKey, ctx.prev)
+    },
+    onSettled: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.folders.list() })
+    },
+  })
+
   qc.setMutationDefaults(mutationKeys.notes.delete, {
     mutationFn: ({ id }: DeleteNoteVars) => noteActions.deleteNote({ id }),
     onMutate: async ({ id }: DeleteNoteVars) => {
@@ -55,6 +75,9 @@ export function registerNoteMutations(qc: QueryClient) {
     },
     onError: (_e, _vars, ctx) => {
       if (ctx?.prev) qc.setQueryData(listKey, ctx.prev)
+    },
+    onSettled: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.folders.list() })
     },
   })
 }

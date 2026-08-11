@@ -5,18 +5,29 @@ import { EditorContent, useEditor, type JSONContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import TextAlign from '@tiptap/extension-text-align'
 
+import FolderPicker from '@/features/folders/components/FolderPicker'
+import type { FolderWithCount } from '@/features/folders/types'
 import type { Note } from '../types'
 import ToolBar from './ToolBar'
 import '../editor.css'
 
 interface NoteEditorProps {
   note: Note | null
+  folders: FolderWithCount[]
   onChangeTitle: (title: string) => void
   onChangeContent: (content: JSONContent) => void
+  onMove: (folderId: string | null) => void
   onFlush: () => void
 }
 
-export default function NoteEditor({ note, onChangeTitle, onChangeContent, onFlush }: NoteEditorProps) {
+export default function NoteEditor({
+  note,
+  folders,
+  onChangeTitle,
+  onChangeContent,
+  onMove,
+  onFlush,
+}: NoteEditorProps) {
   // Mantém os callbacks frescos sem recriar o editor a cada render do pai.
   const onChangeContentRef = useRef(onChangeContent)
   const onFlushRef = useRef(onFlush)
@@ -62,7 +73,7 @@ export default function NoteEditor({ note, onChangeTitle, onChangeContent, onFlu
   return (
     <div className="flex h-full w-full flex-col overflow-hidden">
       <header className="shrink-0 px-4 pt-4">
-        <div className="text-xs text-muted-foreground">Caminho</div>
+        <FolderPicker folders={folders} value={note.folderId} onChange={onMove} />
 
         <input
           value={note.title}

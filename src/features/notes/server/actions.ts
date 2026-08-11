@@ -10,9 +10,11 @@ import { countWords, extractPlainText } from '../utils'
 import type { Note } from '../types'
 import {
   createNoteSchema,
+  moveNoteSchema,
   noteIdSchema,
   updateNoteSchema,
   type CreateNoteInput,
+  type MoveNoteInput,
   type UpdateNoteInput,
 } from './schema'
 
@@ -76,11 +78,20 @@ export async function updateNote(input: UpdateNoteInput) {
     .where(and(eq(notes.id, data.id), eq(notes.userId, user.id)))
 }
 
+export async function moveNote(input: MoveNoteInput) {
+  const user = await requireUser()
+  const data = moveNoteSchema.parse(input)
+
+  await db
+    .update(notes)
+    .set({ folderId: data.folderId, updatedAt: new Date() })
+    .where(and(eq(notes.id, data.id), eq(notes.userId, user.id)))
+}
+
 export async function deleteNote(input: { id: string }) {
   const user = await requireUser()
   const { id } = noteIdSchema.parse(input)
 
-  // Soft delete — a nota vai para a lixeira, não some (docs/plans/04-organizacao.md §4.6).
   await db
     .update(notes)
     .set({ deletedAt: new Date() })

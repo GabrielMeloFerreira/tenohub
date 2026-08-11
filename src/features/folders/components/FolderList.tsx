@@ -9,12 +9,21 @@ import type { FolderWithCount } from '../types'
 
 interface FolderListProps {
   folders: FolderWithCount[]
+  selectedId: string | null
   onCreate: (name: string, color: FolderColor) => string
   onRename: (id: string, name: string) => void
   onDelete: (id: string) => void
+  onSelect: (id: string) => void
 }
 
-export default function FolderList({ folders, onCreate, onRename, onDelete }: FolderListProps) {
+export default function FolderList({
+  folders,
+  selectedId,
+  onCreate,
+  onRename,
+  onDelete,
+  onSelect,
+}: FolderListProps) {
   const [renamingId, setRenamingId] = useState<string | null>(null)
   const [draft, setDraft] = useState('')
 
@@ -59,7 +68,10 @@ export default function FolderList({ folders, onCreate, onRename, onDelete }: Fo
       {folders.map((folder) => (
         <div
           key={folder.id}
-          className="group flex items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-muted"
+          className={cn(
+            'group flex items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-muted',
+            selectedId === folder.id && 'bg-muted'
+          )}
         >
           <span className={cn('size-2 shrink-0 rounded-full', colorClass(folder.color))} />
 
@@ -78,6 +90,7 @@ export default function FolderList({ folders, onCreate, onRename, onDelete }: Fo
           ) : (
             <button
               type="button"
+              onClick={() => onSelect(folder.id)}
               onDoubleClick={() => startRename(folder.id, folder.name)}
               className="min-w-0 flex-1 truncate text-left text-foreground"
             >

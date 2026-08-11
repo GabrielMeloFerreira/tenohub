@@ -13,6 +13,7 @@ export const mutationKeys = {
   notes: {
     create: ['notes', 'create'] as const,
     update: ['notes', 'update'] as const,
+    move: ['notes', 'move'] as const,
     delete: ['notes', 'delete'] as const,
   },
   folders: {

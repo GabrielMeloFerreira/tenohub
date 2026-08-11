@@ -28,7 +28,9 @@ interface NavSidebarProps {
   view: View
   user: { name: string; email: string }
   folders?: React.ReactNode
+  notesActive: boolean
   onChangeView: (view: View) => void
+  onShowAllNotes: () => void
   onCreateNote: () => void
 }
 
@@ -36,7 +38,9 @@ export default function NavSidebar({
   view,
   user,
   folders,
+  notesActive,
   onChangeView,
+  onShowAllNotes,
   onCreateNote,
 }: NavSidebarProps) {
   return (
@@ -77,17 +81,20 @@ export default function NavSidebar({
                 </SidebarMenuButton>
               </SidebarMenuItem>
 
-              {navItems.map((item) => (
-                <SidebarMenuItem key={item.view}>
-                  <SidebarMenuButton
-                    isActive={view === item.view}
-                    onClick={() => onChangeView(item.view)}
-                  >
-                    <item.icon />
-                    <span>{item.label}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {navItems.map((item) => {
+                const isNotes = item.view === 'notes'
+                return (
+                  <SidebarMenuItem key={item.view}>
+                    <SidebarMenuButton
+                      isActive={isNotes ? notesActive : view === item.view}
+                      onClick={isNotes ? onShowAllNotes : () => onChangeView(item.view)}
+                    >
+                      <item.icon />
+                      <span>{item.label}</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                )
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

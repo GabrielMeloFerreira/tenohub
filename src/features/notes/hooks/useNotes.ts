@@ -6,7 +6,7 @@ import type { JSONContent } from '@tiptap/react'
 
 import { newId } from '@/lib/id'
 import { mutationKeys, queryKeys } from '@/lib/query-keys'
-import type { CreateNoteVars, DeleteNoteVars, UpdateNoteVars } from '../query'
+import type { CreateNoteVars, DeleteNoteVars, MoveNoteVars, UpdateNoteVars } from '../query'
 import * as actions from '../server/actions'
 import type { Note } from '../types'
 import { emptyDoc } from '../utils'
@@ -35,6 +35,7 @@ export function useNotes(initialNotes: Note[]) {
 
   const createMut = useMutation<void, Error, CreateNoteVars>({ mutationKey: mutationKeys.notes.create })
   const updateMut = useMutation<void, Error, UpdateNoteVars>({ mutationKey: mutationKeys.notes.update })
+  const moveMut = useMutation<void, Error, MoveNoteVars>({ mutationKey: mutationKeys.notes.move })
   const deleteMut = useMutation<void, Error, DeleteNoteVars>({ mutationKey: mutationKeys.notes.delete })
 
   // Debounce de persistencia por nota.
@@ -104,6 +105,13 @@ export function useNotes(initialNotes: Note[]) {
     [qc, listKey, flush]
   )
 
+  const moveNote = useCallback(
+    (id: string, folderId: string | null) => {
+      moveMut.mutate({ id, folderId })
+    },
+    [moveMut]
+  )
+
   const deleteNote = useCallback(
     (id: string) => {
       deleteMut.mutate({ id })
@@ -111,5 +119,5 @@ export function useNotes(initialNotes: Note[]) {
     [deleteMut]
   )
 
-  return { notes, createNote, updateNote, deleteNote, flushNote }
+  return { notes, createNote, updateNote, moveNote, deleteNote, flushNote }
 }

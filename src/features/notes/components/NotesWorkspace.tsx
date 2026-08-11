@@ -25,17 +25,21 @@ export default function NotesWorkspace({
   initialFolders,
   user,
 }: NotesWorkspaceProps) {
-  const { notes, createNote, updateNote, flushNote } = useNotes(initialNotes)
+  const { notes, createNote, updateNote, moveNote, flushNote } = useNotes(initialNotes)
   const { folders, createFolder, renameFolder, deleteFolder } = useFolders(initialFolders)
 
   const view = useUiStore((s) => s.view)
   const selectedNoteId = useUiStore((s) => s.selectedNoteId)
+  const selectedFolderId = useUiStore((s) => s.selectedFolderId)
   const setView = useUiStore((s) => s.setView)
   const selectNote = useUiStore((s) => s.selectNote)
+  const setSelectedFolder = useUiStore((s) => s.setSelectedFolder)
 
+  const visibleNotes = selectedFolderId
+    ? notes.filter((n) => n.folderId === selectedFolderId)
+    : notes
   const selectedNote = notes.find((n) => n.id === selectedNoteId) ?? null
 
-  // Ao trocar de nota, persiste a anterior na hora — não deixa edição pendente no debounce.
   const handleSelectNote = useCallback(
     (id: string) => {
       flushNote(selectedNoteId)
@@ -44,12 +48,32 @@ export default function NotesWorkspace({
     [flushNote, selectedNoteId, selectNote]
   )
 
+  const handleSelectFolder = useCallback(
+    (id: string) => {
+      setSelectedFolder(id)
+      setView('notes')
+    },
+    [setSelectedFolder, setView]
+  )
+
+  const handleShowAllNotes = useCallback(() => {
+    setSelectedFolder(null)
+    setView('notes')
+  }, [setSelectedFolder, setView])
+
   const handleCreateNote = useCallback(() => {
     flushNote(selectedNoteId)
     const note = createNote()
     selectNote(note.id)
     setView('notes')
   }, [flushNote, selectedNoteId, createNote, selectNote, setView])
+
+  const handleMoveNote = useCallback(
+    (folderId: string | null) => {
+      if (selectedNoteId) moveNote(selectedNoteId, folderId)
+    },
+    [selectedNoteId, moveNote]
+  )
 
   const handleFlush = useCallback(() => flushNote(selectedNoteId), [flushNote, selectedNoteId])
 
@@ -72,22 +96,26 @@ export default function NotesWorkspace({
       <NavSidebar
         view={view}
         user={user}
+        notesActive={view === 'notes' && !selectedFolderId}
         folders={
           <FolderList
             folders={folders}
+            selectedId={selectedFolderId}
             onCreate={createFolder}
             onRename={renameFolder}
             onDelete={deleteFolder}
+            onSelect={handleSelectFolder}
           />
         }
         onChangeView={setView}
+        onShowAllNotes={handleShowAllNotes}
         onCreateNote={handleCreateNote}
       />
 
       {view === 'notes' ? (
         <div className="relative flex min-w-0 flex-1 overflow-hidden">
           <NoteList
-            notes={notes}
+            notes={visibleNotes}
             selectedId={selectedNoteId}
             username={user.name}
             onSelectNote={handleSelectNote}
@@ -95,8 +123,10 @@ export default function NotesWorkspace({
           />
           <NoteEditor
             note={selectedNote}
+            folders={folders}
             onChangeTitle={handleChangeTitle}
             onChangeContent={handleChangeContent}
+            onMove={handleMoveNote}
             onFlush={handleFlush}
           />
           <SyncStatus />
