@@ -6,6 +6,7 @@ import TaskItem from '@tiptap/extension-task-item'
 import Placeholder from '@tiptap/extension-placeholder'
 
 import { Callout } from './extensions/callout'
+import { SelectionHighlight } from './extensions/selection-highlight'
 
 export const editorExtensions = [
   StarterKit.configure({
@@ -24,6 +25,7 @@ export const editorExtensions = [
   TaskList,
   TaskItem.configure({ nested: true }),
   Callout,
+  SelectionHighlight,
   Placeholder.configure({
     showOnlyCurrent: false,
     placeholder: ({ node, editor }) =>

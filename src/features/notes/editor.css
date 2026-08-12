@@ -32,6 +32,11 @@
   pointer-events: none;
 }
 
+.ProseMirror .selection-highlight {
+  background-color: color-mix(in srgb, var(--color-primary) 30%, transparent);
+  border-radius: 0.15em;
+}
+
 .ProseMirror h1,
 .ProseMirror h2,
 .ProseMirror h3 {

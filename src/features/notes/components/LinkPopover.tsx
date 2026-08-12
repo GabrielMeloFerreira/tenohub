@@ -1,18 +1,42 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import type { Editor } from '@tiptap/react'
 import { Link as LinkIcon } from 'lucide-react'
 
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { getButtonClass } from '../styles'
+import { selectionHighlightKey } from '../extensions/selection-highlight'
 
 export default function LinkPopover({ editor }: { editor: Editor }) {
   const [open, setOpen] = useState(false)
   const [url, setUrl] = useState('')
+  const anchorRect = useRef<DOMRect | null>(null)
+
+  const anchor = { getBoundingClientRect: () => anchorRect.current ?? new DOMRect() }
+
+  function highlight(active: boolean) {
+    const { from, to } = editor.state.selection
+    editor.view.dispatch(
+      editor.state.tr.setMeta(selectionHighlightKey, active ? { from, to } : null)
+    )
+  }
 
   function handleOpenChange(next: boolean) {
-    if (next) setUrl((editor.getAttributes('link').href as string | undefined) ?? '')
+    if (next) {
+      const { from, to } = editor.state.selection
+      const start = editor.view.coordsAtPos(from)
+      const end = editor.view.coordsAtPos(to)
+      const left = Math.min(start.left, end.left)
+      const right = Math.max(start.right, end.right)
+      const top = Math.min(start.top, end.top)
+      const bottom = Math.max(start.bottom, end.bottom)
+      anchorRect.current = new DOMRect(left, top, right - left, bottom - top)
+      setUrl((editor.getAttributes('link').href as string | undefined) ?? '')
+      highlight(true)
+    } else {
+      highlight(false)
+    }
     setOpen(next)
   }
 
@@ -20,12 +44,12 @@ export default function LinkPopover({ editor }: { editor: Editor }) {
     const value = url.trim()
     if (value) editor.chain().focus().setLink({ href: value }).run()
     else editor.chain().focus().unsetLink().run()
-    setOpen(false)
+    handleOpenChange(false)
   }
 
   function remove() {
     editor.chain().focus().unsetLink().run()
-    setOpen(false)
+    handleOpenChange(false)
   }
 
   return (
@@ -37,7 +61,7 @@ export default function LinkPopover({ editor }: { editor: Editor }) {
       >
         <LinkIcon size={16} />
       </PopoverTrigger>
-      <PopoverContent>
+      <PopoverContent anchor={anchor} side="bottom" align="center">
         <form
           onSubmit={(e) => {
             e.preventDefault()
