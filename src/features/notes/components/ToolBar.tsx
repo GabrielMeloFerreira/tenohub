@@ -57,7 +57,7 @@ export default function ToolBar({ editor }: ToolBarProps) {
   }
 
   return (
-    <div className="sticky top-0 z-10 flex flex-wrap items-center gap-0.5 border-b border-border bg-background/95 px-4 py-1.5 backdrop-blur">
+    <div className="flex shrink-0 flex-wrap items-center gap-0.5 border-b border-border bg-background px-3 py-1.5">
       <button
         type="button"
         title="Desfazer"

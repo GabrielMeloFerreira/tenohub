@@ -69,6 +69,7 @@ export async function updateNote(input: UpdateNoteInput) {
     patch.content = data.content
     Object.assign(patch, searchFields(data.content))
   }
+  if (data.isFavorite !== undefined) patch.isFavorite = data.isFavorite
 
   // O filtro por userId aqui não é redundância: garante que ninguém edite nota alheia
   // forjando um id, mesmo que o RLS esteja desligado por engano.

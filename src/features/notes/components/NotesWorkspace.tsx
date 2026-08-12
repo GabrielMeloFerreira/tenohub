@@ -13,7 +13,6 @@ import { titleFromDoc } from '../utils'
 import type { Note } from '../types'
 import NoteEditor from './NoteEditor'
 import NoteList from './NoteList'
-import SyncStatus from './SyncStatus'
 
 interface NotesWorkspaceProps {
   initialNotes: Note[]
@@ -26,7 +25,8 @@ export default function NotesWorkspace({
   initialFolders,
   user,
 }: NotesWorkspaceProps) {
-  const { notes, createNote, updateNote, moveNote, flushNote } = useNotes(initialNotes)
+  const { notes, createNote, updateNote, moveNote, flushNote, toggleFavorite } =
+    useNotes(initialNotes)
   const { folders, createFolder, renameFolder, deleteFolder } = useFolders(initialFolders)
 
   const view = useUiStore((s) => s.view)
@@ -85,6 +85,13 @@ export default function NotesWorkspace({
     [selectedNoteId, updateNote]
   )
 
+  const handleToggleFavorite = useCallback(
+    (isFavorite: boolean) => {
+      if (selectedNoteId) toggleFavorite(selectedNoteId, isFavorite)
+    },
+    [selectedNoteId, toggleFavorite]
+  )
+
   return (
     <>
       <NavSidebar
@@ -121,8 +128,8 @@ export default function NotesWorkspace({
             onChangeContent={handleChangeContent}
             onMove={handleMoveNote}
             onFlush={handleFlush}
+            onToggleFavorite={handleToggleFavorite}
           />
-          <SyncStatus />
         </div>
       ) : (
         <div className="flex flex-1 items-center justify-center text-sm text-muted-foreground">

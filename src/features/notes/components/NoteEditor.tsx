@@ -1,12 +1,15 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { EditorContent, useEditor, type JSONContent } from '@tiptap/react'
 
-import FolderPicker from '@/features/folders/components/FolderPicker'
-import { editorExtensions } from '../editor-extensions'
 import type { FolderWithCount } from '@/features/folders/types'
+import { editorExtensions } from '../editor-extensions'
 import type { Note } from '../types'
+import { countChars, countWords, ensureTitleBodyDoc, extractPlainText } from '../utils'
+import NoteMetaBar from './NoteMetaBar'
+import NoteStatusBar from './NoteStatusBar'
+import NoteTopBar from './NoteTopBar'
 import ToolBar from './ToolBar'
 import '../editor.css'
 
@@ -16,6 +19,7 @@ interface NoteEditorProps {
   onChangeContent: (content: JSONContent) => void
   onMove: (folderId: string | null) => void
   onFlush: () => void
+  onToggleFavorite: (isFavorite: boolean) => void
 }
 
 export default function NoteEditor({
@@ -24,6 +28,7 @@ export default function NoteEditor({
   onChangeContent,
   onMove,
   onFlush,
+  onToggleFavorite,
 }: NoteEditorProps) {
   const onChangeContentRef = useRef(onChangeContent)
   const onFlushRef = useRef(onFlush)
@@ -34,7 +39,7 @@ export default function NoteEditor({
 
   const editor = useEditor({
     extensions: editorExtensions,
-    content: note?.content ?? '',
+    content: note ? ensureTitleBodyDoc(note.content) : '',
     shouldRerenderOnTransaction: true,
     immediatelyRender: false,
     onUpdate: ({ editor }) => onChangeContentRef.current(editor.getJSON()),
@@ -49,8 +54,14 @@ export default function NoteEditor({
     if (loadedNoteId.current === note.id) return
 
     loadedNoteId.current = note.id
-    editor.commands.setContent(note.content, { emitUpdate: false })
+    editor.commands.setContent(ensureTitleBodyDoc(note.content), { emitUpdate: false })
   }, [editor, note])
+
+  const stats = useMemo(() => {
+    if (!note) return { words: 0, chars: 0 }
+    const text = extractPlainText(note.content)
+    return { words: countWords(text), chars: countChars(text) }
+  }, [note])
 
   if (!note) {
     return (
@@ -61,16 +72,26 @@ export default function NoteEditor({
   }
 
   return (
-    <div className="flex h-full w-full flex-col overflow-hidden">
-      <header className="shrink-0 px-4 pt-4">
-        <FolderPicker folders={folders} value={note.folderId} onChange={onMove} />
-      </header>
+    <div className="flex h-full w-full min-w-0 flex-col overflow-hidden bg-background">
+      <NoteTopBar
+        title={note.title}
+        folders={folders}
+        folderId={note.folderId}
+        isFavorite={note.isFavorite}
+        onMove={onMove}
+        onToggleFavorite={() => onToggleFavorite(!note.isFavorite)}
+      />
 
       <ToolBar editor={editor} />
 
       <div className="min-h-0 flex-1 overflow-y-auto">
-        <EditorContent editor={editor} className="h-full px-4 py-4 text-foreground" />
+        <div className="w-full px-3 pt-5 pb-20">
+          <NoteMetaBar updatedAt={note.updatedAt} createdAt={note.createdAt} />
+          <EditorContent editor={editor} className="text-foreground" />
+        </div>
       </div>
+
+      <NoteStatusBar wordCount={stats.words} charCount={stats.chars} />
     </div>
   )
 }

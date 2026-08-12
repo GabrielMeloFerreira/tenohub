@@ -13,7 +13,7 @@ import { emptyDoc } from '../utils'
 
 const SAVE_DEBOUNCE_MS = 800
 
-type Patch = { title?: string; content?: JSONContent }
+type Patch = { title?: string; content?: JSONContent; isFavorite?: boolean }
 
 /**
  * CRUD de notas sobre o cache do TanStack Query, com escrita otimista e persistencia
@@ -119,5 +119,13 @@ export function useNotes(initialNotes: Note[]) {
     [deleteMut]
   )
 
-  return { notes, createNote, updateNote, moveNote, deleteNote, flushNote }
+  /** Favorito: persiste na hora (sem debounce de digitação). */
+  const toggleFavorite = useCallback(
+    (id: string, isFavorite: boolean) => {
+      updateMut.mutate({ id, patch: { isFavorite } })
+    },
+    [updateMut]
+  )
+
+  return { notes, createNote, updateNote, moveNote, deleteNote, flushNote, toggleFavorite }
 }

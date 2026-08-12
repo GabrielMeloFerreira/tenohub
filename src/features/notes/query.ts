@@ -5,7 +5,10 @@ import * as noteActions from './server/actions'
 import type { Note } from './types'
 
 export type CreateNoteVars = Note
-export type UpdateNoteVars = { id: string; patch: { title?: string; content?: Note['content'] } }
+export type UpdateNoteVars = {
+  id: string
+  patch: { title?: string; content?: Note['content']; isFavorite?: boolean }
+}
 export type MoveNoteVars = { id: string; folderId: string | null }
 export type DeleteNoteVars = { id: string }
 

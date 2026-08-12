@@ -15,6 +15,7 @@ export const updateNoteSchema = z.object({
   id: z.uuid(),
   title: z.string().max(500).optional(),
   content: contentSchema.optional(),
+  isFavorite: z.boolean().optional(),
 })
 
 export const moveNoteSchema = z.object({
