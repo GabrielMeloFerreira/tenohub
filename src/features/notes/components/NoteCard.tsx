@@ -42,7 +42,12 @@ export default function NoteCard({ note, isSelected, onSelect }: NoteCardProps) 
         dragging && 'opacity-50'
       )}
     >
-      <span className="truncate text-sm font-medium text-foreground">
+      <span
+        className={cn(
+          'truncate text-sm font-medium',
+          note.title ? 'text-foreground' : 'italic text-muted-foreground'
+        )}
+      >
         {note.title || 'Sem título'}
       </span>
       <span className="line-clamp-2 text-xs text-muted-foreground">
