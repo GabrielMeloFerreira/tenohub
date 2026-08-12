@@ -8,6 +8,7 @@ import { makeQueryClient } from '@/lib/query-client'
 import { createIdbPersister } from '@/lib/idb-persister'
 import { registerNoteMutations } from '@/features/notes/query'
 import { registerFolderMutations } from '@/features/folders/query'
+import { registerTagMutations } from '@/features/tags/query'
 
 const CACHE_BUSTER = 'v1'
 const THIRTY_DAYS = 1000 * 60 * 60 * 24 * 30
@@ -16,6 +17,7 @@ function buildQueryClient() {
   const qc = makeQueryClient()
   registerNoteMutations(qc)
   registerFolderMutations(qc)
+  registerTagMutations(qc)
   return qc
 }
 

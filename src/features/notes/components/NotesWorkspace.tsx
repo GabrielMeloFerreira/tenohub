@@ -1,12 +1,14 @@
 'use client'
 
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 import type { JSONContent } from '@tiptap/react'
 
 import NavSidebar from '@/components/layout/NavSidebar'
 import FolderList from '@/features/folders/components/FolderList'
 import { useFolders } from '@/features/folders/hooks/useFolders'
 import type { FolderWithCount } from '@/features/folders/types'
+import { useTags } from '@/features/tags/hooks/useTags'
+import type { NoteTagLink, Tag } from '@/features/tags/types'
 import { useUiStore } from '@/stores/ui-store'
 import { useNotes } from '../hooks/useNotes'
 import { titleFromDoc } from '../utils'
@@ -17,17 +19,25 @@ import NoteList from './NoteList'
 interface NotesWorkspaceProps {
   initialNotes: Note[]
   initialFolders: FolderWithCount[]
+  initialTags: Tag[]
+  initialNoteTagLinks: NoteTagLink[]
   user: { name: string; email: string }
 }
 
 export default function NotesWorkspace({
   initialNotes,
   initialFolders,
+  initialTags,
+  initialNoteTagLinks,
   user,
 }: NotesWorkspaceProps) {
   const { notes, createNote, updateNote, moveNote, flushNote, toggleFavorite } =
     useNotes(initialNotes)
   const { folders, createFolder, renameFolder, deleteFolder } = useFolders(initialFolders)
+  const { getTagsForNote, addTagToNote, removeTagFromNote, suggestionsForNote } = useTags(
+    initialTags,
+    initialNoteTagLinks
+  )
 
   const view = useUiStore((s) => s.view)
   const selectedNoteId = useUiStore((s) => s.selectedNoteId)
@@ -40,6 +50,11 @@ export default function NotesWorkspace({
     ? notes.filter((n) => n.folderId === selectedFolderId)
     : notes
   const selectedNote = notes.find((n) => n.id === selectedNoteId) ?? null
+
+  const selectedNoteTags = useMemo(
+    () => (selectedNoteId ? getTagsForNote(selectedNoteId) : []),
+    [getTagsForNote, selectedNoteId]
+  )
 
   const handleSelectNote = useCallback(
     (id: string) => {
@@ -92,6 +107,29 @@ export default function NotesWorkspace({
     [selectedNoteId, toggleFavorite]
   )
 
+  const handleAddTag = useCallback(
+    (name: string) => {
+      if (!selectedNoteId) return false
+      return addTagToNote(selectedNoteId, name)
+    },
+    [selectedNoteId, addTagToNote]
+  )
+
+  const handleRemoveTag = useCallback(
+    (tagId: string) => {
+      if (selectedNoteId) removeTagFromNote(selectedNoteId, tagId)
+    },
+    [selectedNoteId, removeTagFromNote]
+  )
+
+  const handleTagSuggestions = useCallback(
+    (query: string) => {
+      if (!selectedNoteId) return []
+      return suggestionsForNote(selectedNoteId, query)
+    },
+    [selectedNoteId, suggestionsForNote]
+  )
+
   return (
     <>
       <NavSidebar
@@ -125,10 +163,14 @@ export default function NotesWorkspace({
           <NoteEditor
             note={selectedNote}
             folders={folders}
+            noteTags={selectedNoteTags}
             onChangeContent={handleChangeContent}
             onMove={handleMoveNote}
             onFlush={handleFlush}
             onToggleFavorite={handleToggleFavorite}
+            onAddTag={handleAddTag}
+            onRemoveTag={handleRemoveTag}
+            tagSuggestions={handleTagSuggestions}
           />
         </div>
       ) : (

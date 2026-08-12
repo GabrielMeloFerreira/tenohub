@@ -1,9 +1,10 @@
 'use client'
 
-import { useEffect, useMemo, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { EditorContent, useEditor, type JSONContent } from '@tiptap/react'
 
 import type { FolderWithCount } from '@/features/folders/types'
+import type { Tag } from '@/features/tags/types'
 import { editorExtensions } from '../editor-extensions'
 import type { Note } from '../types'
 import { countChars, countWords, ensureTitleBodyDoc, extractPlainText } from '../utils'
@@ -16,19 +17,27 @@ import '../editor.css'
 interface NoteEditorProps {
   note: Note | null
   folders: FolderWithCount[]
+  noteTags: Tag[]
   onChangeContent: (content: JSONContent) => void
   onMove: (folderId: string | null) => void
   onFlush: () => void
   onToggleFavorite: (isFavorite: boolean) => void
+  onAddTag: (name: string) => boolean
+  onRemoveTag: (tagId: string) => void
+  tagSuggestions: (query: string) => Tag[]
 }
 
 export default function NoteEditor({
   note,
   folders,
+  noteTags,
   onChangeContent,
   onMove,
   onFlush,
   onToggleFavorite,
+  onAddTag,
+  onRemoveTag,
+  tagSuggestions,
 }: NoteEditorProps) {
   const onChangeContentRef = useRef(onChangeContent)
   const onFlushRef = useRef(onFlush)
@@ -63,6 +72,9 @@ export default function NoteEditor({
     return { words: countWords(text), chars: countChars(text) }
   }, [note])
 
+  const handleAddTag = useCallback((name: string) => onAddTag(name), [onAddTag])
+  const handleRemoveTag = useCallback((tagId: string) => onRemoveTag(tagId), [onRemoveTag])
+
   if (!note) {
     return (
       <div className="flex h-full flex-1 items-center justify-center text-sm text-muted-foreground">
@@ -86,7 +98,15 @@ export default function NoteEditor({
 
       <div className="min-h-0 flex-1 overflow-y-auto">
         <div className="w-full px-3 pt-5 pb-20">
-          <NoteMetaBar updatedAt={note.updatedAt} createdAt={note.createdAt} />
+          <NoteMetaBar
+            noteId={note.id}
+            updatedAt={note.updatedAt}
+            createdAt={note.createdAt}
+            tags={noteTags}
+            onAddTag={handleAddTag}
+            onRemoveTag={handleRemoveTag}
+            suggestionsFor={tagSuggestions}
+          />
           <EditorContent editor={editor} className="text-foreground" />
         </div>
       </div>

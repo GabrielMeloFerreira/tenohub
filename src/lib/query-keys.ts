@@ -7,6 +7,11 @@ export const queryKeys = {
     all: ['folders'] as const,
     list: () => ['folders', 'list'] as const,
   },
+  tags: {
+    all: ['tags'] as const,
+    list: () => ['tags', 'list'] as const,
+    links: () => ['tags', 'links'] as const,
+  },
 }
 
 export const mutationKeys = {
@@ -20,5 +25,9 @@ export const mutationKeys = {
     create: ['folders', 'create'] as const,
     rename: ['folders', 'rename'] as const,
     delete: ['folders', 'delete'] as const,
+  },
+  tags: {
+    addToNote: ['tags', 'addToNote'] as const,
+    removeFromNote: ['tags', 'removeFromNote'] as const,
   },
 }
